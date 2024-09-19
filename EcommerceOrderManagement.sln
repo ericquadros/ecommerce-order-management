@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement", "src\EcommerceOrderManagement\EcommerceOrderManagement.csproj", "{FA4F19AB-0A27-49A9-BD53-BD0EE353BEEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.WebApi", "src\EcommerceOrderManagement.WebApi\EcommerceOrderManagement.WebApi.csproj", "{71FD16B1-E81C-4501-9FBF-A0161615BED6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.Migrations", "src\EcommerceOrderManagement.Migrations\EcommerceOrderManagement.Migrations.csproj", "{71EF7C98-5A81-4383-91F9-3F39A0DE7805}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA4F19AB-0A27-49A9-BD53-BD0EE353BEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA4F19AB-0A27-49A9-BD53-BD0EE353BEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA4F19AB-0A27-49A9-BD53-BD0EE353BEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA4F19AB-0A27-49A9-BD53-BD0EE353BEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71FD16B1-E81C-4501-9FBF-A0161615BED6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71FD16B1-E81C-4501-9FBF-A0161615BED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71FD16B1-E81C-4501-9FBF-A0161615BED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71FD16B1-E81C-4501-9FBF-A0161615BED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
