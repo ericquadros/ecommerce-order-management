@@ -6,4 +6,4 @@ Repositório para o desafio final C# do jeito certo
 Run in your terminal:  
 ``docker compose up -d``
 
-``docker compose up -d``
+``dotnet ef database update``
