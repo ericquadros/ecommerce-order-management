@@ -25,6 +25,12 @@ public class ProductMapping: IEntityTypeConfiguration<Product>
         builder.Property(p => p.ImageUrl)
             .HasMaxLength(255) // Optional, adjust based on your requirements
             .HasColumnType("varchar(255)");
+        
+        builder.Property(o => o.CreatedAt)
+            .HasColumnType("datetime");
+        
+        builder.Property(o => o.UpdatedAt)
+            .HasColumnType("datetime");
 
         // Configure the relationship to ProductCategory
         builder.HasOne(p => p.Category)

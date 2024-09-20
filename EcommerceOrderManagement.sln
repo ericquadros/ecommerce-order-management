@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.Migrations", "src\EcommerceOrderManagement.Migrations\EcommerceOrderManagement.Migrations.csproj", "{71EF7C98-5A81-4383-91F9-3F39A0DE7805}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.EventConsumer", "EcommerceOrderManagement.EventConsumer\EcommerceOrderManagement.EventConsumer.csproj", "{42577310-07AD-470D-8749-68B6632F523C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcommerceOrderManagement.EventConsumer", "src\EcommerceOrderManagement.EventConsumer\EcommerceOrderManagement.EventConsumer.csproj", "{49966B54-EF17-4793-9DCB-D3A50EBF5B94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,9 +26,9 @@ Global
 		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71EF7C98-5A81-4383-91F9-3F39A0DE7805}.Release|Any CPU.Build.0 = Release|Any CPU
-		{42577310-07AD-470D-8749-68B6632F523C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42577310-07AD-470D-8749-68B6632F523C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42577310-07AD-470D-8749-68B6632F523C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42577310-07AD-470D-8749-68B6632F523C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49966B54-EF17-4793-9DCB-D3A50EBF5B94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49966B54-EF17-4793-9DCB-D3A50EBF5B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49966B54-EF17-4793-9DCB-D3A50EBF5B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49966B54-EF17-4793-9DCB-D3A50EBF5B94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

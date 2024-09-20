@@ -17,4 +17,21 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderRequest>
     }
 }
 
-public record CreateOrderRequest(string ProductId, string Quantity);
+public record CreateOrderRequest(
+    CustomerRequest Customer,
+    List<OrderItemRequest> Items,
+    decimal TotalAmount
+);
+
+public record CustomerRequest(
+    string FirstName,                       
+    string LastName,                        
+    string Email,                           
+    string Phone                            
+);
+
+public record OrderItemRequest(
+    string ProductId,                       
+    int Quantity,                           
+    decimal UnitPrice                       
+);

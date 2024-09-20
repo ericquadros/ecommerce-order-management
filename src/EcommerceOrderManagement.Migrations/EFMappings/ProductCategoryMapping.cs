@@ -18,5 +18,11 @@ public class ProductCategoryMapping : IEntityTypeConfiguration<ProductCategory>
         builder.Property(pc => pc.Description)
             .HasMaxLength(500)
             .HasColumnType("varchar(500)");
+        
+        builder.Property(o => o.CreatedAt)
+            .HasColumnType("datetime");
+        
+        builder.Property(o => o.UpdatedAt)
+            .HasColumnType("datetime");
     }
 }

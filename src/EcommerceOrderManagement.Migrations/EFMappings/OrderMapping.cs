@@ -12,8 +12,11 @@ public class OrderMapping : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.Total)
             .HasColumnType("decimal(18,2)");
-
+        
         builder.Property(o => o.CreatedAt)
+            .HasColumnType("datetime");
+        
+        builder.Property(o => o.UpdatedAt)
             .HasColumnType("datetime");
 
         // Configure the relationship with OrderItem
