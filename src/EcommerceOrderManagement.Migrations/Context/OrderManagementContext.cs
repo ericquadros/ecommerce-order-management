@@ -15,6 +15,7 @@ public class OrderManagementDbContext : DbContext
     public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Customer> Customers { get; set; }
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     { 
@@ -22,6 +23,7 @@ public class OrderManagementDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ProductCategoryMapping());
         modelBuilder.ApplyConfiguration(new OrderMapping());
         modelBuilder.ApplyConfiguration(new OrderItemMapping());
+        modelBuilder.ApplyConfiguration(new CustomerMapping());
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -15,6 +15,12 @@ public class OrderItemMapping : IEntityTypeConfiguration<OrderItem>
 
         builder.Property(oi => oi.Quantity)
             .HasColumnType("int");
+        
+        builder.Property(o => o.CreatedAt)
+            .HasColumnType("datetime");
+        
+        builder.Property(o => o.UpdatedAt)
+            .HasColumnType("datetime");
 
         // Configure the relationship with Product
         builder.HasOne<Product>(oi => oi.Product)
