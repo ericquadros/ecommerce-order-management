@@ -11,6 +11,34 @@ services:
 #      context: .
 #    ports:
 #      - "5000:80"
+  
+#  
+#  consumer-order-management:
+#    image: ecommerce-order-consumer:latest # Adjust for running with context
+#    container_name: consumer-order-management
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - DOTNET_RUNNING_IN_CONTAINER=true
+#      - Kafka__Topic=OrderTopic
+#    volumes:
+#      - ./appsettings.OrderManagement.json:/app/appsettings.json
+#    depends_on:
+#      - kafka
+#    restart: always
+#
+#  consumer-payment:
+#    image: ecommerce-order-consumer:latest # Adjust for running with context
+#    container_name: consumer-payment
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - DOTNET_RUNNING_IN_CONTAINER=true
+#      - Kafka__Topic=PaymentTopic
+#    volumes:
+#      - ./appsettings.PaymentManagement.json:/app/appsettings.json
+#    depends_on:
+#      - kafka
+#    restart: always
+  
   db:
     container_name: db
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -23,6 +51,108 @@ services:
       - db-data-order-management:/var/opt/mssql/data
     ports:
       - "1433:1433"
+#  
+#  zookeeper:
+#    image: bitnami/zookeeper:3.8.0
+#    container_name: zookeeper
+#    environment:
+#      - ALLOW_ANONYMOUS_LOGIN=yes
+#    ports:
+#      - "2181:2181"
+#   
+#  kafka:
+#    image: bitnami/kafka:3.3.1
+#    container_name: kafka
+#    environment:
+#      - KAFKA_ENABLE_KRAFT=yes
+#      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+#      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:2181
+#      - KAFKA_BROKER_ID=1
+#      - ALLOW_PLAINTEXT_LISTENER=yes
+#      - KAFKA_CFG_NODE_ID=1
+#      - KAFKA_KRAFT_CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+#      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@localhost:9092
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "9092:9092"
+#
+#  kafkaui:
+#    container_name: kafka-ui
+#    image: "provectuslabs/kafka-ui:latest"
+#    ports:
+#      - "28080:8080"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "0.4"
+#          memory: 350M
+#    environment:
+#      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9092
+#      KAFKA_CLUSTERS_0_NAME: KafkaCluster
+#    depends_on:
+#      - kafka
+#             
+
+  kafka:
+    image: "bitnami/kafka:3.3.1"
+    container_name: kafka
+    hostname: kafka.dev-local.bemdev.com.br
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka.dev-local.bemdev.com.br:9092
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka.dev-local.bemdev.com.br:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - 9092:9092
+    networks:
+      - infranet
+
+  kafkaui:
+    container_name: kafka-ui
+    image: "provectuslabs/kafka-ui:latest"
+    ports:
+      - "28080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 350M
+    environment:
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka.dev-local.bemdev.com.br:9092
+      KAFKA_CLUSTERS_0_NAME: MkU3OEVBNTcwNTJENDM2Qk
+      VIRTUAL_HOST_MULTIPORTS: |-
+        kafka-ui.dev-local.bemdev.com.br:
+          "/":
+            port: 8080
+            dest: "/"
+
+    networks:
+      - infranet
+
+  ingress:
+    image: jwilder/nginx-proxy
+    container_name: ingress
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - infranet
+
+networks:
+  infranet:
+    external: true
 
 volumes:
   db-data-order-management:      

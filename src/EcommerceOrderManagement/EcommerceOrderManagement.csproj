@@ -7,4 +7,21 @@
         <RootNamespace>EcommerceOrderManagement.Domain</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="NotificationsContext\" />
+      <Folder Include="OrderManagementContext\Orders\Application\Commands\" />
+      <Folder Include="OrderManagementContext\Orders\Application\Validators\" />
+      <Folder Include="OrderManagementContext\Orders\Domain\Repositories\" />
+      <Folder Include="OrderManagementContext\Orders\Domain\Services\" />
+      <Folder Include="OrderManagementContext\Orders\Domain\ValueObjects\" />
+      <Folder Include="OrderManagementContext\Orders\Infrastructure\EFMappings\" />
+      <Folder Include="OrderManagementContext\Orders\Infrastructure\Repositories\" />
+      <Folder Include="PaymentManagementContext\" />
+      <Folder Include="StockManagementContext\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FastEndpoints" Version="5.29.0" />
+    </ItemGroup>
+
 </Project>
