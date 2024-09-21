@@ -1,10 +1,13 @@
-using EcommerceOrderManagement.Domain.Domain.OrderManagementContext.Endpoints;
+using System.Globalization;
+using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Infrastructure.EFContext;
+using EcommerceOrderManagement.OrderManagementContext.Endpoints;
 using FastEndpoints;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddFastEndpoints(o =>
 {
     o.Assemblies = new[]
@@ -15,9 +18,42 @@ builder.Services.AddFastEndpoints(o =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var environment = builder.Environment.EnvironmentName;
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("pt-BR"),
+        new CultureInfo("en-US")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("pt-BR");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
+var connectionString = builder.Configuration.GetConnectionString("OrderManagementDatabase");
+builder.Services.AddDbContext<OrderManagementDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.ConfigureDomainDependenciesServices();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.MapGet("/culture", () => 
+{
+    return new 
+    {
+        CurrentCulture = CultureInfo.CurrentCulture.Name,
+        CurrentUICulture = CultureInfo.CurrentUICulture.Name
+    };
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -27,28 +63,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 // app.UseAuthorization();
 
-// Configura o FastEndpoints para carregar os endpoints do assembly de EcommerceOrderManagement
 app.UseFastEndpoints();
-
-// var summaries = new[]
-// {
-//     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-// };
-//
-// app.MapGet("/weatherforecast", () =>
-//     {
-//         var forecast = Enumerable.Range(1, 5).Select(index =>
-//                 new WeatherForecast
-//                 (
-//                     DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//                     Random.Shared.Next(-20, 55),
-//                     summaries[Random.Shared.Next(summaries.Length)]
-//                 ))
-//             .ToArray();
-//         return forecast;
-//     })
-//     .WithName("GetWeatherForecast")
-//     .WithOpenApi();
 
 app.Run();
 

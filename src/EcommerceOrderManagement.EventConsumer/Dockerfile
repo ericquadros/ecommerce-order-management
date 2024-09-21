@@ -1,4 +1,6 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
+﻿ENV ASPNETCORE_CULTURE=pt-BR
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 

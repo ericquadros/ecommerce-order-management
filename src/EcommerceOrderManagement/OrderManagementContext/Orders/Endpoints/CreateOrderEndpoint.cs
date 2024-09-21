@@ -1,37 +1,60 @@
-namespace EcommerceOrderManagement.Domain.Domain.OrderManagementContext.Endpoints;
+using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Handlers;
+using CreateOrderCommand = EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands.CreateOrderCommand;
+
+namespace EcommerceOrderManagement.OrderManagementContext.Endpoints;
 
 using FastEndpoints;
 
 public class CreateOrderEndpoint : Endpoint<CreateOrderRequest>
 {
+    private readonly CreateOrderHandler _handler;
+    public CreateOrderEndpoint(CreateOrderHandler handler)
+    {
+        _handler = handler;
+    }
+    
     public override void Configure()
     {
         Post("/orders");
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CreateOrderRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CreateOrderRequest req, CancellationToken cancellationToken)
     {
-        // Lógica para criar o pedido
-        await SendOkAsync(new { Message = "Order created successfully!" }, ct);
+        var commandResult = CreateOrderCommand.Create(req.Customer, req.Items, req.TotalAmount);
+
+        if (commandResult.IsFailure)
+        {
+            await SendAsync(new { Error = commandResult.Error }, 400, cancellationToken);
+            return;
+        }
+
+        var result = await _handler.Handle(commandResult.Value!, cancellationToken);
+        if (result.IsFailure)
+        {
+            await SendAsync(new { Error = commandResult.Error }, 400, cancellationToken);
+            return;
+        }
+        
+        await SendOkAsync(new { Message = "Order created successfully!", Data = result.Value }, cancellationToken);
     }
 }
 
 public record CreateOrderRequest(
-    CustomerRequest Customer,
-    List<OrderItemRequest> Items,
+    Customer Customer,
+    List<OrderItem> Items,
     decimal TotalAmount
 );
 
-public record CustomerRequest(
+public record Customer(
     string FirstName,                       
     string LastName,                        
     string Email,                           
     string Phone                            
 );
 
-public record OrderItemRequest(
+public record OrderItem(
     string ProductId,                       
     int Quantity,                           
-    decimal UnitPrice                       
+    decimal Price                       
 );

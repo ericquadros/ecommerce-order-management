@@ -4,3 +4,29 @@ GET {{EcommerceOrderManagement.WebApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+## Create an order with eletronics products
+POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Customer": {
+    "FirstName": "John",
+    "LastName": "Snow",
+    "Email": "john.snow@winterfell.com",
+    "Phone": "123-456-7890"
+  },
+  "Items": [
+    {
+      "ProductId": "0350ab23-28e1-4bb3-227d-08dcda5a2e50",
+      "Quantity": 2,
+      "Price": 4099.99
+    },
+    {
+      "ProductId": "8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf",
+      "Quantity": 1,
+      "Price": 999.99
+    }
+  ],
+  "TotalAmount": 9199.97
+}

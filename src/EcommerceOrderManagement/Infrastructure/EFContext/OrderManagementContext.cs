@@ -1,10 +1,14 @@
-using EcommerceOrderManagement.Infrastructure.EFContext.Interfaces;
+using System.Globalization;
+using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Migrations.EFMappings;
+using EcommerceOrderManagement.Migrations.Models;
+using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace EcommerceOrderManagement.Infrastructure.EFContext;
 
-public class OrderManagementDbContext : DbContext
+public class OrderManagementDbContext : DbContext, IUnitOfWork
 {
     private static IConfiguration _configuration;
     public OrderManagementDbContext(DbContextOptions<OrderManagementDbContext> options, IConfiguration configuration)
@@ -13,32 +17,33 @@ public class OrderManagementDbContext : DbContext
         _configuration = configuration;
     }
     
-    // public DbSet<Product> Products { get; set; }
-    // public DbSet<ProductCategory> ProductCategories { get; set; }
-    // public DbSet<Order> Orders { get; set; }
-    // public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<ProductCategory> ProductCategories { get; set; }
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     { 
-        // modelBuilder.ApplyConfiguration(new ProductMapping());
-        // modelBuilder.ApplyConfiguration(new ProductCategoryMapping());
-        // modelBuilder.ApplyConfiguration(new OrderMapping());
-        // modelBuilder.ApplyConfiguration(new OrderItemMapping());
+        modelBuilder.ApplyConfiguration(new OrderMapping());
+        modelBuilder.ApplyConfiguration(new CustomerMapping());
+        modelBuilder.ApplyConfiguration(new OrderItemMapping());
+        modelBuilder.ApplyConfiguration(new ProductCategoryMapping());
+        modelBuilder.ApplyConfiguration(new ProductMapping());
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // var configuration = new ConfigurationBuilder()
-        //     .SetBasePath(Directory.GetCurrentDirectory())
-        //     .AddJsonFile("appsettings.json")
-        //     .Build();
-
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
+        
         string connectionString = _configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
                                  
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseSqlServer(connectionString)
+            .EnableDetailedErrors()
+            .EnableSensitiveDataLogging();
     }
     
-    public override int SaveChanges()
+    public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -47,18 +52,24 @@ public class OrderManagementDbContext : DbContext
                 if (item.State == EntityState.Added)
                 {
                     item.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
-                }
-                else if (item.State == EntityState.Modified)
-                {
                     item.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
                 }
+                else if (item.State == EntityState.Modified)
+                    item.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
             }
-
-            return base.SaveChanges();
+        
+            var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return result > 0;
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            throw ex;
+            Console.WriteLine(e);
+            throw e;
         }
     }
+}
+
+public interface IUnitOfWork
+{
+    Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default);
 }
