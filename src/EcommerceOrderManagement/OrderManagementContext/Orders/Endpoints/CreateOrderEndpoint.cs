@@ -21,7 +21,7 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderRequest>
 
     public override async Task HandleAsync(CreateOrderRequest req, CancellationToken cancellationToken)
     {
-        var commandResult = CreateOrderCommand.Create(req.Customer, req.Items, req.TotalAmount);
+        var commandResult = CreateOrderCommand.Create(req.Customer, req.Items, req.TotalAmount, req.Payment);
 
         if (commandResult.IsFailure)
         {
@@ -43,8 +43,8 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderRequest>
 public record CreateOrderRequest(
     Customer Customer,
     List<OrderItem> Items,
-    decimal TotalAmount
-    // PaymentDetails Payment 
+    decimal TotalAmount,
+    PaymentDetails Payment 
 );
 
 public record Customer(
@@ -61,24 +61,18 @@ public record OrderItem(
 );
 
 public record PaymentDetails(
-    PaymentMethod Method, 
+    string Method, 
     PixPayment? Pix, 
-    CardPayment? CreditCard
+    CardPayment? Card
 );
 
-public enum PaymentMethod
-{
-    Pix,
-    Card
-}
-
 public record PixPayment(
-    string TransactionId // Exemplo de ID da transação do Pix
+    string TransactionId
 );
 
 public record CardPayment(
     string CardNumber,
     string CardHolder,
-    string ExpiryDate,
+    string ExpirationDate,
     string Cvv
 );

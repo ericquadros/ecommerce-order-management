@@ -5,14 +5,19 @@ namespace EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Events;
 
 public class OrderCompletedEvent : IDomainEvent<Order>
 {
-    public string EventName { get; private set; }
-    public Order Object { get; private set; }
-    public DateTime OccurredOn { get; private set; }
+    public string EventName { get; set; }
+    public Order Object { get; set; }
+    public DateTime OccurredOn { get; set; }
 
     public OrderCompletedEvent(Order order)
     {
-        EventName = "OrderCompleted";
+        EventName = "OrderCompletedWaitingProcessing";
         Object = order;
         OccurredOn = DateTime.Now;
+    }
+    
+    // Constructor to deserialize
+    public OrderCompletedEvent()
+    {
     }
 }

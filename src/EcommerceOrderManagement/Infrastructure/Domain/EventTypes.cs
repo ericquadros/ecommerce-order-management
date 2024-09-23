@@ -2,7 +2,8 @@ namespace EcommerceOrderManagement.Domain.Infrastructure;
 
 public enum EventTypes
 {
-    OrderCompleted = 0,
-    PaymentReceived = 1,
-    OrderShipped = 2,
+    OrderCompletedWaitingProcessing = 0,
+    OrderPaymentProcessing = 1,
+    // PaymentReceived = 1,
+    // OrderShipped = 2,
 }

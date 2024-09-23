@@ -24,8 +24,7 @@ public class OrderItem : Entity
 
     public decimal GetTotalPrice() => Quantity * Price;
 
-    public void AssignItemToOrder(Guid orderId)
-    {
-        OrderId = orderId;
-    }
+    public void AssignItemToOrder(Guid orderId) => OrderId = orderId;
+    public void AssignItemToProduct(Guid productId) => ProductId = productId;
+
 }

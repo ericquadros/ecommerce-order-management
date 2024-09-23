@@ -2,7 +2,7 @@
 @EcommerceOrderManagement.OrderIdToCancel = 68b4b8d2-33c7-4a40-82a1-fe81cbecc53b
 
 ###
-## Create an order with eletronics products
+## Create an order with eletronics products with pix
 POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders
 Content-Type: application/json
 Accept: application/json
@@ -26,7 +26,52 @@ Accept: application/json
       "Price": 999.99
     }
   ],
-  "TotalAmount": 9199.97
+  "TotalAmount": 9199.97,
+  "Payment": {
+    "Method": "Pix",
+    "Pix": {
+      "TransactionId": "abc-123-pix-trans-id"
+    },
+    "CreditCard": null
+  }
+}
+
+###
+## Create an order with eletronics products with card
+POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Customer": {
+    "FirstName": "Daenerys",
+    "LastName": "Targaryen",
+    "Email": "daenerys.targaryen@winterfell.com",
+    "Phone": "123-456-7890"
+  },
+  "Items": [
+    {
+      "ProductId": "0350ab23-28e1-4bb3-227d-08dcda5a2e50",
+      "Quantity": 2,
+      "Price": 4099.99
+    },
+    {
+      "ProductId": "8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf",
+      "Quantity": 1,
+      "Price": 999.99
+    }
+  ],
+  "TotalAmount": 9199.97,
+  "Payment": {
+    "Method": "Card",
+    "Pix": null,
+    "Card": {
+      "CardNumber": "4111111111111111",
+      "CardHolder": "Daenerys Targaryen",
+      "ExpirationDate": "12/25",
+      "Cvv": "123"
+    }
+  }
 }
 
 ###

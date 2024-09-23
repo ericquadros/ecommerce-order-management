@@ -9,6 +9,9 @@ public class Order
     public Guid CustomerId { get; set; }
     public Customer Customer { get; set; }
     public ICollection<OrderItem> Items { get; set; }
+    public PixPayment? PixPayment { get; set; }
+    public CardPayment? CardPayment { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    
 }

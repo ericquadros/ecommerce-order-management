@@ -16,6 +16,8 @@ public class OrderManagementDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<PixPayment> PixPayments { get; set; }
+    public DbSet<CardPayment> CardPayments { get; set; }
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     { 
@@ -24,6 +26,8 @@ public class OrderManagementDbContext : DbContext
         modelBuilder.ApplyConfiguration(new OrderMapping());
         modelBuilder.ApplyConfiguration(new OrderItemMapping());
         modelBuilder.ApplyConfiguration(new CustomerMapping());
+        modelBuilder.ApplyConfiguration(new PixPaymentMapping());
+        modelBuilder.ApplyConfiguration(new CardPaymentMapping());
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

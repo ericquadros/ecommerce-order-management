@@ -1,6 +1,7 @@
 using EcommerceOrderManagement.Domain.Infrastructure;
 using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
 using EcommerceOrderManagement.Infrastructure.EFContext;
@@ -31,9 +32,17 @@ public class CreateOrderHandler(
             return validationResult;
 
         var order = new Order(customer, orderItems, command.TotalAmount);
+        
+        // Validar e associar o pagamento usando o método privado
+        var paymentResult = ValidateAndCreatePayment(command, order);
+        if (paymentResult.IsFailure)
+            return Result.Failure(paymentResult.Error);
+
+        order.SetPayment(paymentResult.Value);
 
         order.AddDiscountStrategies(discountStrategies);
         order.CalculateTotalWithDiscount();
+        
         order.CompleteOrder();
         
         await context.Orders.AddAsync(order, cancellationToken);
@@ -60,6 +69,32 @@ public class CreateOrderHandler(
             return Result.Failure("One or more products does not exists.");
         
         return Result.Success();
+    }
+    
+    private Result<IPayment> ValidateAndCreatePayment(CreateOrderCommand command, Order order)
+    {
+        if (command.PaymentMethod == OrderPaymentType.Pix.ToString() && command.PixPayment != null)
+        {
+            var pixPayment = new PixPayment(
+                command.PixPayment.TransactionId,
+                order.Id
+            );
+            return pixPayment;
+        }
+        if (command.PaymentMethod == OrderPaymentType.Card.ToString() && command.CardPayment != null)
+        {
+            // Criar a instância do pagamento Cartão
+            var cardPayment = new CardPayment(
+                command.CardPayment.CardNumber,
+                command.CardPayment.CardHolder,
+                command.CardPayment.ExpirationDate,
+                command.CardPayment.Cvv,
+                order.Id
+            );
+            return cardPayment;
+        }
+        
+        return Result.Failure("Invalid payment method.");
     }
 }
 

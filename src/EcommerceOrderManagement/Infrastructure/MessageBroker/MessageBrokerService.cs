@@ -31,6 +31,7 @@ public class MessageBrokerService : IMessageBroker
             // Obtendo o nome do tópico a partir do EventName usando o enum
             if (Enum.TryParse<EventTypes>(domainEvent.EventName, out var eventType))
             {
+                // Get topic name from json appsettings
                 var topic = GetEventTopic(eventType);
 
                 KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
@@ -46,11 +47,6 @@ public class MessageBrokerService : IMessageBroker
                 { 
                     Value = domainEventJson 
                 });
-                await producer.ProduceAsync( "eccomerce.order-management-context.order-test" , new Message<Null, string> 
-                { 
-                    Value = domainEventJson 
-                });
-               
             }
             else
                 throw new ArgumentException($"Event type {domainEvent.EventName} is not recognized.");

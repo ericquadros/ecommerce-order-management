@@ -8,26 +8,44 @@ public class CreateOrderCommand
     public Customer Customer { get; }
     public List<OrderItem> Items { get; }
     public decimal TotalAmount { get; }
+    public string PaymentMethod { get; }
+    public PixPayment PixPayment { get; }
+    public CardPayment CardPayment { get; }
 
-    private CreateOrderCommand(Customer customer, List<OrderItem> items, decimal totalAmount)
+    private CreateOrderCommand(Customer customer, List<OrderItem> items, decimal totalAmount, string paymentMethod, PixPayment pixPayment, CardPayment cardPayment)
     {
         Customer = customer;
         Items = items;
         TotalAmount = totalAmount;
+        PaymentMethod = paymentMethod;
+        PixPayment = pixPayment;
+        CardPayment = cardPayment;
     }
 
-    public static Result<CreateOrderCommand> Create(Customer customer, List<OrderItem> items, decimal totalAmount)
+    public static Result<CreateOrderCommand> Create(Customer customer, List<OrderItem> items, decimal totalAmount, PaymentDetails paymentDetails)
     {
         var result = Result.Combine(
             ValidateCustomer(customer),
             ValidateItems(items),
-            ValidateTotalAmount(totalAmount)
+            ValidateTotalAmount(totalAmount),
+            ValidatePaymentMethod(paymentDetails.Method.ToString())
         );
 
         if (result.IsFailure)
             return Result<CreateOrderCommand>.Failure(result.Error);
 
-        return new CreateOrderCommand(customer, items, totalAmount);
+        return new CreateOrderCommand(customer, items, totalAmount, paymentDetails.Method, paymentDetails.Pix, paymentDetails.Card);
+    }
+
+    private static Result ValidatePaymentMethod(string paymentMethod)
+    {
+        if (string.IsNullOrEmpty(paymentMethod))
+            return Result.Failure("Payment method must be provided.");
+
+        if (paymentMethod != "Pix" && paymentMethod != "Card")
+            return Result.Failure("Invalid payment method. Only 'Pix' or 'Card' are accepted.");
+
+        return Result.Success();
     }
 
     private static Result ValidateCustomer(Customer customer)

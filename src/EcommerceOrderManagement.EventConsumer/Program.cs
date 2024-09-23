@@ -1,7 +1,11 @@
-﻿using EcommerceOrderManagement.EventConsumer.Infrastructure;
+﻿using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.EventHandlers;
+using EcommerceOrderManagement.EventConsumer.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.Infrastructure.Interfaces;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
+using EcommerceOrderManagement.Infrastructure.EFContext;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -64,7 +68,12 @@ public static class ServiceExtensions
 
         services.AddSingleton(kafkaSettings);
         services.AddSingleton<IKafkaMessageProcessorFactory, KafkaMessageProcessorFactory>();
+        
+        var connectionString = configuration.GetConnectionString("OrderManagementDatabase");
+        services.AddDbContext<OrderManagementDbContext>(options =>
+            options.UseSqlServer(connectionString));
 
+        services.ConfigureDomainDependenciesServices();
         // Register your services here
         services.AddSingleton<IKafkaConsumer, KafkaConsumer>();
         services.AddHostedService<KafkaConsumerService>();
@@ -72,7 +81,7 @@ public static class ServiceExtensions
         // Register specific processors
         // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>();
         // services.AddScoped<IKafkaEventProcessorStrategy, OrderEventProcessorStrategy>();
-        services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingPaymentProcessorStrategy>();
-        services.AddScoped<IKafkaEventProcessorStrategy, ProcessTestProcessorStrategy>();
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingProcessingStrategy>();
+        // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>(); // TODO: Uncomment
     }
 }
