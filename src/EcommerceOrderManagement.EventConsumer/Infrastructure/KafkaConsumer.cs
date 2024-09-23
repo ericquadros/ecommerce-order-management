@@ -1,5 +1,6 @@
 using Confluent.Kafka.Admin;
 using EcommerceOrderManagement.EventConsumer.Infrastructure.Interfaces;
+using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
 using Microsoft.Extensions.Logging;
 
 namespace EcommerceOrderManagement.EventConsumer.Infrastructure;
@@ -11,13 +12,15 @@ using System.Threading.Tasks;
 
 public class KafkaConsumer : IKafkaConsumer
 {
+    private readonly IEnumerable<IKafkaEventProcessorStrategy> _strategies;
     private readonly KafkaSettings _settings;
     private readonly ILogger _logger;
 
-    public KafkaConsumer(KafkaSettings settings, ILogger<KafkaConsumer> logger)
+    public KafkaConsumer(KafkaSettings settings, ILogger<KafkaConsumer> logger, IEnumerable<IKafkaEventProcessorStrategy> strategies)
     {
         _settings = settings;
         _logger = logger;
+        _strategies = strategies;
     }
 
     public async Task ConsumeAsync(string topic, Func<string, Task> processMessage)
@@ -26,14 +29,9 @@ public class KafkaConsumer : IKafkaConsumer
         {
             BootstrapServers = _settings.BootstrapServers,
             GroupId = _settings.ConsumerGroupId,
-            AutoOffsetReset = Enum.TryParse<AutoOffsetReset>(_settings.AutoOffsetReset, out var autoOffsetReset) 
-                ? autoOffsetReset 
-                : AutoOffsetReset.Earliest // fallback to Earliest if the conversion fails
+            AutoOffsetReset = _settings.AutoOffsetReset
         };
-        
-        // Create topic if it not exists
-        await EnsureTopicExistsAsync(topic);
-        
+
         using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {
             consumer.Subscribe(topic);
@@ -43,7 +41,7 @@ public class KafkaConsumer : IKafkaConsumer
                 while (true)
                 {
                     var cr = consumer.Consume(CancellationToken.None);
-                    if (cr.Message != null)
+                    if (cr.Message != null && !string.IsNullOrWhiteSpace(cr.Topic))
                     {
                         await processMessage(cr.Message.Value);
                     }
@@ -51,7 +49,6 @@ public class KafkaConsumer : IKafkaConsumer
             }
             catch (OperationCanceledException)
             {
-                // The consumer has canceled, excecute it to finalize correctly
                 consumer.Close();
             }
             catch (ConsumeException ex)
@@ -61,49 +58,50 @@ public class KafkaConsumer : IKafkaConsumer
         }
     }
 
-    private async Task EnsureTopicExistsAsync(string topic)
+    public async Task ConsumeAsync(IEnumerable<string> topics)
     {
-        var adminConfig = new AdminClientConfig
+        var config = new ConsumerConfig
         {
-            BootstrapServers = _settings.BootstrapServers
+            BootstrapServers = _settings.BootstrapServers,
+            GroupId = _settings.ConsumerGroupId,
+            AutoOffsetReset = _settings.AutoOffsetReset
         };
-
-        using (var adminClient = new AdminClientBuilder(adminConfig).Build())
+        using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {
+            consumer.Subscribe(topics);
+
             try
             {
-                var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
-                if (metadata.Topics.Exists(t => t.Topic == topic))
-                    return;
-
-                _logger.LogInformation($"O tópico '{topic}' não existe.");
-
-                // Se o tópico não existir, crie-o
-                _logger.LogInformation($"Criando o tópico '{topic}'...");
-
-                var topicSpecification = new TopicSpecification
+                while (true)
                 {
-                    Name = topic,
-                    NumPartitions = _settings.NumPartitions,
-                    ReplicationFactor = _settings.ReplicationFactor
-                };
-
-                await adminClient.CreateTopicsAsync(new[] { topicSpecification });
-
-                _logger.LogInformation($"Tópico '{topic}' criado com sucesso.");
+                    var cr = consumer.Consume(CancellationToken.None);
+                    if (cr.Message != null && !string.IsNullOrWhiteSpace(cr.Topic))
+                    {
+                        await ProcessMessageAsync(cr.Topic, cr.Message.Value);
+                    }
+                }
             }
-            catch (CreateTopicsException e)
+            catch (OperationCanceledException)
             {
-                if (e.Results[0].Error.Code != ErrorCode.TopicAlreadyExists)
-                {
-                    _logger.LogError($"Erro ao criar o tópico: {e.Results[0].Error.Reason}");
-                    throw;
-                }
-                else
-                {
-                    _logger.LogInformation($"Tópico '{topic}' já existia.");
-                }
+                consumer.Close();
+            }
+            catch (ConsumeException ex)
+            {
+                _logger.LogError($"Erro ao consumir o tópico: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task ProcessMessageAsync(string topic, string message)
+    {
+        foreach (var strategy in _strategies)
+        {
+            if (strategy.CanExecute(topic))
+            {
+                await strategy.ProcessAsync(message);
+                break; // Para ao encontrar a estratégia correspondente
             }
         }
     }
 }
+

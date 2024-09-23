@@ -51,11 +51,11 @@ public class OrderManagementDbContext : DbContext, IUnitOfWork
             {
                 if (item.State == EntityState.Added)
                 {
-                    item.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
-                    item.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+                    item.Property("CreatedAt").CurrentValue = DateTime.Now;
+                    item.Property("UpdatedAt").CurrentValue = DateTime.Now;
                 }
                 else if (item.State == EntityState.Modified)
-                    item.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+                    item.Property("UpdatedAt").CurrentValue = DateTime.Now;
             }
         
             var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

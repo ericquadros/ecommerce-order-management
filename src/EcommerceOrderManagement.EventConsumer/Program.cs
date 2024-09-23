@@ -18,8 +18,8 @@ public class Program
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", true, true)
             .AddJsonFile($"appsettings.{environment}.json", true, true)
-            .AddJsonFile("appsettings.Payment.json", true, true)
             .AddJsonFile("appsettings.OrderManagement.json", true, true)
+            .AddJsonFile("appsettings.Payment.json", true, true)
             .Build();
 
         Log.Logger = new LoggerConfiguration()
@@ -70,7 +70,9 @@ public static class ServiceExtensions
         services.AddHostedService<KafkaConsumerService>();
 
         // Register specific processors
-        services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>();
-        services.AddScoped<IKafkaEventProcessorStrategy, OrderEventProcessorStrategy>();
+        // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>();
+        // services.AddScoped<IKafkaEventProcessorStrategy, OrderEventProcessorStrategy>();
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingPaymentProcessorStrategy>();
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessTestProcessorStrategy>();
     }
 }

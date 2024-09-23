@@ -1,7 +1,5 @@
 @EcommerceOrderManagement.WebApi_HostAddress = http://localhost:5032
-
-GET {{EcommerceOrderManagement.WebApi_HostAddress}}/weatherforecast/
-Accept: application/json
+@EcommerceOrderManagement.OrderIdToCancel = 68b4b8d2-33c7-4a40-82a1-fe81cbecc53b
 
 ###
 ## Create an order with eletronics products
@@ -30,3 +28,16 @@ Accept: application/json
   ],
   "TotalAmount": 9199.97
 }
+
+###
+## Get orders with pagination
+GET {{EcommerceOrderManagement.WebApi_HostAddress}}/orders?page=1&pageSize=20
+Accept: application/json
+
+###
+## Cancel an order
+DELETE {{EcommerceOrderManagement.WebApi_HostAddress}}/orders/{{EcommerceOrderManagement.OrderIdToCancel}}/cancel
+Content-Type: application/json
+Accept: application/json
+
+{}

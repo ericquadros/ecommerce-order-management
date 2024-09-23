@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Domain.Infrastructure;
 
-public enum EEventTypes
+public enum EventTypes
 {
     OrderCompleted = 0,
     PaymentReceived = 1,

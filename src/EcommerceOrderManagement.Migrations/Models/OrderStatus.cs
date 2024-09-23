@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Migrations.Models;
 
-public enum EOrderStatus
+public enum OrderStatus
 {
     AwaitingProcessing = 0,      // AguardandoProcessamento
     ProcessingPayment = 1,       // ProcessandoPagamento

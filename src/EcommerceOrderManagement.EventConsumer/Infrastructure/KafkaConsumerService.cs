@@ -19,15 +19,24 @@ public class KafkaConsumerService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        // Consume each topic in a separate task to allow for parallel consumption
+        var tasks = new List<Task>();
+
         foreach (var topic in _kafkaSettings.Topics)
         {
-            await _kafkaConsumer.ConsumeAsync(topic, async (message) =>
+            tasks.Add(Task.Run(async () =>
             {
-                // Select correct processor and process the message
-                var processor = _messageProcessorFactory.GetProcessor(topic);
-                await processor.ProcessAsync(message);
-            });
+                await _kafkaConsumer.ConsumeAsync(topic, async (message) =>
+                {
+                    // Select correct processor and process the message
+                    var processor = _messageProcessorFactory.GetProcessor(topic);
+                    await processor.ProcessAsync(message);
+                });
+            }, cancellationToken));
         }
+
+        // Wait for all tasks to complete
+        await Task.WhenAll(tasks);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

@@ -1,4 +1,6 @@
 using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +12,13 @@ public static class DependenciesConfigurationExtensions
     {
         services.AddScoped<IMessageBroker, MessageBrokerService>();
         services.AddScoped<CreateOrderHandler>();
+        services.AddScoped<CancelOrderHandler>();
+        services.AddScoped<GetOrdersQueryHandler>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        
         // services.AddScoped<IEfDbContextAccessor<DigitacaoDbContextAccessor>>(); // Disabled for now
+        
+        services.AddScoped<IDiscountStrategy, OrderQuantityDiscountStrategy>();
+        services.AddScoped<IDiscountStrategy, OrderSeasonalDiscountStrategy>();
     }
 }

@@ -28,8 +28,8 @@ public class Customer : Entity
             throw new ArgumentException("First name cannot be null or empty.");
         if (string.IsNullOrWhiteSpace(LastName))
             throw new ArgumentException("Last name cannot be null or empty.");
-        // if (string.IsNullOrWhiteSpace(Email))
-        //     throw new ArgumentException("Email cannot be null or empty.");
+        if (Email is null || string.IsNullOrWhiteSpace(Email.Address))
+            throw new ArgumentException("Email cannot be null or empty.");
         if (string.IsNullOrWhiteSpace(Phone))
             throw new ArgumentException("Phone cannot be null or empty.");
     }

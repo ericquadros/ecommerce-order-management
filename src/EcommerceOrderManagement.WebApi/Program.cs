@@ -13,6 +13,7 @@ builder.Services.AddFastEndpoints(o =>
     o.Assemblies = new[]
     {
         typeof(CreateOrderEndpoint).Assembly
+        // typeof(CancelOrderEndpoint).Assembly,
     };
 });
 builder.Services.AddEndpointsApiExplorer();

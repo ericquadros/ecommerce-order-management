@@ -22,6 +22,8 @@ public class OrderMapping : IEntityTypeConfiguration<Order>
         builder.Property(o => o.UpdatedAt)
             .HasColumnType("datetime");
         
+        builder.Ignore(p=>p.DiscountAmount);
+        
         // Configurando the relationship with Customer
         builder.HasOne(o => o.Customer)
             .WithMany() // An Customer can has many Orders

@@ -13,6 +13,6 @@ public class OrderCompletedEvent : IDomainEvent<Order>
     {
         EventName = "OrderCompleted";
         Object = order;
-        OccurredOn = DateTime.UtcNow;
+        OccurredOn = DateTime.Now;
     }
 }

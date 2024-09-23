@@ -1,6 +1,7 @@
 using EcommerceOrderManagement.Domain.Infrastructure;
 using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
@@ -10,7 +11,8 @@ namespace EcommerceOrderManagement.OrderManagementContext.Orders.Application.Han
 
 public class CreateOrderHandler(
     OrderManagementDbContext context,
-    IMessageBroker brokerService) : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
+    IMessageBroker brokerService,
+    IEnumerable<IDiscountStrategy> discountStrategies) : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
 {
     public async Task<Result<CreateOrderResponse>> Handle(
         CreateOrderCommand command,
@@ -29,6 +31,10 @@ public class CreateOrderHandler(
             return validationResult;
 
         var order = new Order(customer, orderItems, command.TotalAmount);
+
+        order.AddDiscountStrategies(discountStrategies);
+        order.CalculateTotalWithDiscount();
+        order.CompleteOrder();
         
         await context.Orders.AddAsync(order, cancellationToken);
         var entitiesAdded = await context.SaveEntitiesAsync(cancellationToken);
@@ -65,13 +71,3 @@ public record CreateOrderResponse(
     string OrderId,
     string Status,
     decimal TotalAmount);
-
-//
-// public record CreateOrderRequest(
-//     CustomerRequest Customer,
-//     List<OrderItemRequest> Items,
-//     decimal TotalAmount);
-
-// public record CreateOrderCommand(
-//     CreateOrderRequest Request) : IRequest<ResultResponse<CreateOrderResponse>>;
-

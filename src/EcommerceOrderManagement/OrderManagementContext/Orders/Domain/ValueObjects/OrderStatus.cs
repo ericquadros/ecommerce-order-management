@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
 
-public enum EOrderStatus
+public enum OrderStatus
 {
     AwaitingProcessing = 0,
     ProcessingPayment = 1, 
@@ -8,5 +8,5 @@ public enum EOrderStatus
     PickingOrder = 3,      
     Completed = 4,         
     WaitingForStock = 5,   
-    Canceled = 6           
+    Cancelled = 6           
 }
