@@ -17,12 +17,15 @@ public static class DependenciesConfigurationExtensions
         services.AddScoped<CancelOrderHandler>();
         services.AddScoped<GetOrdersQueryHandler>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        
         services.AddScoped<ProcessAwaitProcessingEventHandler>();
         services.AddScoped<ProcessProcessingPaymentEventHandler>();
+        services.AddScoped<ProcessPaymentDoneEventHandler>();
         
         // services.AddScoped<IEfDbContextAccessor<DigitacaoDbContextAccessor>>(); // Disabled for now
         
         services.AddScoped<IDiscountStrategy, OrderQuantityDiscountStrategy>();
         services.AddScoped<IDiscountStrategy, OrderSeasonalDiscountStrategy>();
+        
     }
 }

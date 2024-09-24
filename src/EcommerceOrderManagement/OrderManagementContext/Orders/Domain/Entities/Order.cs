@@ -3,10 +3,12 @@ using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entit
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
 using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.Events;
+using EcommerceOrderManagement.Domain.PaymentManagementContext.StockItems.Application.Events;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Events;
 using EcommerceOrderManagement.PaymentManagementContext.Payments.Application.Events;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 
@@ -77,6 +79,16 @@ public class Order : Entity
         return Result.Success();
     }
     
+    public Result FinalizeOrder()
+    {
+        if (Status != OrderStatus.PickingOrder)
+            return Result.Failure("The status should be PickingOrder");
+        
+        Status = OrderStatus.Completed;
+
+        return Result.Success();
+    }
+    
     public Result SetStatusProcessingPayment()
     {
         if (Status != OrderStatus.AwaitingProcessing)
@@ -89,6 +101,28 @@ public class Order : Entity
         
         // if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderProcessingPaymentStatusChangedEvent))))
         _domainEvents.Add(new OrderProcessingPaymentStatusChangedEvent(this));
+
+        return Result.Success();
+    }
+
+    public Result SetStatusPickingOrder()
+    {
+        // StringToDateOnlyConverter: REMOVE
+        // if (Status != OrderStatus.PaymentCompleted)
+        //     return Result.Failure("The status should be PaymentCompleted");
+
+        Status = OrderStatus.PickingOrder;
+        _domainEvents.Add(new OrderPickingItemsStatusChangedEvent(this));
+        
+        return Result.Success();
+    }
+    
+    public Result SetStatusAwaitingStock()
+    {
+        if (Status != OrderStatus.PickingOrder) 
+            return Result.Failure("The status should be PickingOrder");
+        
+        Status = OrderStatus.WaitingForStock;
 
         return Result.Success();
     }

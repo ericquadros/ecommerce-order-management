@@ -37,4 +37,8 @@
       <ProjectReference Include="..\EcommerceOrderManagement\EcommerceOrderManagement.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="StockManagementContext\" />
+    </ItemGroup>
+
 </Project>

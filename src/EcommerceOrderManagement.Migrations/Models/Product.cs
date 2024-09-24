@@ -11,6 +11,11 @@ public class Product
 
     public string ImageUrl { get; set; }
     
+    public int StockQuantity { get; set; } 
+    
+    public string OwnerName { get; set; }
+    public string OwnerEmail { get; set; } 
+    
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

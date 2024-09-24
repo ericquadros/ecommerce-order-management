@@ -22,5 +22,10 @@ public class Product : Entity
     public decimal Price { get; private set; }
     internal Guid CategoryId { get; } 
     public ProductCategory Category { get;  private set; } 
+    
+    public Owner Owner { get; set; } 
+    public int StockQuantity { get; set; }
     public string ImageUrl { get; private set; }
 }
+
+public record Owner(string OwnerName, string OwnerEmail);

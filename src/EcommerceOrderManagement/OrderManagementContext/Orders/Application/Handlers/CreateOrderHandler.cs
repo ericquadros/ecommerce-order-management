@@ -68,6 +68,7 @@ public class CreateOrderHandler(
         var productIds = items.Select(i => i.ProductId).ToList();
         var existingProducts = await context.Products
             .Where(p => productIds.Contains(p.Id))
+            .Select(p=>p.Id)
             .ToListAsync(cancellationToken);
 
         if (existingProducts.Count != productIds.Count)

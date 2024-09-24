@@ -28,6 +28,7 @@ public class Program
 
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
+            .Enrich.FromLogContext() 
             .CreateLogger();
 
         try
@@ -79,9 +80,8 @@ public static class ServiceExtensions
         services.AddHostedService<KafkaConsumerService>();
 
         // Register specific processors
-        // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>();
-        // services.AddScoped<IKafkaEventProcessorStrategy, OrderEventProcessorStrategy>();
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingProcessingStrategy>();
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessProcessingPaymentStrategy>();
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentDoneStrategy>();
     }
 }

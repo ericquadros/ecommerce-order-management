@@ -26,6 +26,25 @@ public class ProductMapping: IEntityTypeConfiguration<Product>
             .HasMaxLength(255) // Optional, adjust based on your requirements
             .HasColumnType("varchar(255)");
         
+        builder.OwnsOne(o => o.Owner, owner =>
+        {
+            owner.Property(p => p.OwnerName)
+                .HasColumnName("OwnerName")
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnType("varchar(100)");
+
+            owner.Property(p => p.OwnerEmail)
+                .HasColumnName("OwnerEmail")
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnType("varchar(255)");
+        });
+
+        builder.Property(o => o.StockQuantity)
+            .IsRequired()
+            .HasDefaultValue(0);
+        
         builder.Property(o => o.CreatedAt)
             .HasColumnType("datetime");
         

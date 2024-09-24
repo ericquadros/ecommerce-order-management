@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Infrastructure\Mail\" />
       <Folder Include="OrderManagementContext\Orders\Application\Validators\" />
       <Folder Include="OrderManagementContext\Orders\Domain\Repositories\" />
       <Folder Include="OrderManagementContext\Orders\Domain\Services\" />
-      <Folder Include="PaymentManagementContext\" />
-      <Folder Include="StockManagementContext\" />
+      <Folder Include="OrderManagementContext\StockItems\Services\" />
     </ItemGroup>
 
     <ItemGroup>

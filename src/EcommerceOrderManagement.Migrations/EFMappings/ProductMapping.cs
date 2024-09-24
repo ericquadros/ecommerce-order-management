@@ -23,7 +23,19 @@ public class ProductMapping: IEntityTypeConfiguration<Product>
             .HasColumnType("decimal(18,2)");
 
         builder.Property(p => p.ImageUrl)
-            .HasMaxLength(255) // Optional, adjust based on your requirements
+            .HasMaxLength(255)
+            .HasColumnType("varchar(255)");
+        
+        builder.Property(p => p.StockQuantity)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(p => p.OwnerName)
+            .HasMaxLength(100)
+            .HasColumnType("varchar(100)");
+
+        builder.Property(p => p.OwnerEmail)
+            .HasMaxLength(255)
             .HasColumnType("varchar(255)");
         
         builder.Property(o => o.CreatedAt)

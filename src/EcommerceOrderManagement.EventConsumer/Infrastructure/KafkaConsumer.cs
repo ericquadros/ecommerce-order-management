@@ -35,7 +35,6 @@ public class KafkaConsumer : IKafkaConsumer
         using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {
             consumer.Subscribe(topic);
-
             try
             {
                 while (true)
