@@ -1,4 +1,4 @@
-namespace EcommerceOrderManagement.Domain.Infrastructure;
+namespace EcommerceOrderManagement.Infrastructure;
 
 public readonly struct Result
 {

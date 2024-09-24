@@ -1,5 +1,5 @@
+using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Commands;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Handlers;
-using CancelOrderCommand = EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands.CancelOrderCommand;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Endpoints;
 

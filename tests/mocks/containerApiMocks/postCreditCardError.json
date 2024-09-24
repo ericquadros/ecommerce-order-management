@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "route": "pay/credit-card"
+    "route": "pay/credit-card/error"
   },
   "response": {
     "status": 400,

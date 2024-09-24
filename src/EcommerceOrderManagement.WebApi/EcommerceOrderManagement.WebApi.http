@@ -89,7 +89,19 @@ Accept: application/json
 {}
 
 ### 
-POST http://localhost:5005/pay/credit-card
+POST http://localhost:5055/pay/credit-card
+
+{
+   "pedidoId": "aaaa"
+}
+
+### 
+POST http://localhost:5055/pay/pix
+
+{
+   "pedidoId": "abc"
+}
+
 
 ###
 GET http://localhost:5005/hello/a

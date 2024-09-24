@@ -1,6 +1,6 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
+using EcommerceOrderManagement.Infrastructure;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 

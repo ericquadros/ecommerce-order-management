@@ -1,4 +1,4 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Migrations.Models;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
@@ -14,8 +14,7 @@ public class OrderItem : Entity
     private OrderItem() // EF
     { }
 
-    
-    internal Guid ProductId { get; private set; }
+    public Guid ProductId { get; private set; }
     public Product Product { get; private set; }
     internal Guid OrderId { get; private set; }
     // public Order Order { get; private set; }

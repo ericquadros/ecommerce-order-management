@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Confluent.Kafka;
-using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
-namespace EcommerceOrderManagement.Domain.Infrastructure;
+namespace EcommerceOrderManagement.Infrastructure;
 
 public class MessageBrokerService : IMessageBroker
 {
@@ -22,6 +22,9 @@ public class MessageBrokerService : IMessageBroker
     {
         try
         {
+            if (domainEvent is null)
+                return;
+            
             var bootstrapServers = _configuration.GetValue<string>("Kafka:BootstrapServers");
             var config = new ProducerConfig
             {
@@ -37,12 +40,15 @@ public class MessageBrokerService : IMessageBroker
                 KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
         
                 var producer = new ProducerBuilder<Null, string>(config).Build();
-
-                var domainEventJson = JsonSerializer.Serialize(domainEvent, new JsonSerializerOptions
+                
+                var jsonSettings = new JsonSerializerSettings
                 {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = false // Opcional, se você não precisar da indentação para leitura fácil.
-                });
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignorar referências circulares
+                    NullValueHandling = NullValueHandling.Ignore // Ignorar valores nulos
+                };
+                // Serializa o evento, evitando as referências e eventos
+                var domainEventJson = JsonConvert.SerializeObject(domainEvent, jsonSettings);
+
                 await producer.ProduceAsync(topic, new Message<Null, string> 
                 { 
                     Value = domainEventJson 

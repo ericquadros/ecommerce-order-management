@@ -3,7 +3,7 @@ using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace EcommerceOrderManagement.Domain.Infrastructure;
+namespace EcommerceOrderManagement.Infrastructure;
 
 public static class KafkaHelper
 {

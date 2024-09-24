@@ -6,14 +6,14 @@ using Newtonsoft.Json;
 
 namespace EcommerceOrderManagement.EventConsumer.PaymentManagementContext.Infrastructure.EventConsumers;
 
-public class ProcessProcessingPaymentStrategy : IKafkaEventProcessorStrategy
+public class ProcessPaymentDoneStrategy : IKafkaEventProcessorStrategy
 {
-    private readonly ProcessProcessingPaymentEventHandler _handler;
+    private readonly ProcessProcessingPaymentEventHandler _handler; // payment done implement
     
     private readonly ILogger<ProcessWaitingProcessingStrategy> _logger;
-    private const string TOPIC = "ecommerce-order-management.order-processing-payment-status-changed";
+    private const string TOPIC = "ecommerce-order-management.order-payment-done-status-changed";
     
-    public ProcessProcessingPaymentStrategy(
+    public ProcessPaymentDoneStrategy(
         ProcessProcessingPaymentEventHandler handler,
         ILogger<ProcessWaitingProcessingStrategy> logger)
     {

@@ -22,7 +22,7 @@ public class KafkaMessageProcessorFactory : IKafkaMessageProcessorFactory
         var processor = _processorStrategies.FirstOrDefault(p => p.CanExecute(topic));
         
         if (processor == null)
-            throw new ArgumentException($"No processor found for topic: {topic}");
+            throw new ArgumentException($"No processor found for this topic: {topic}");
 
         return processor;
     }

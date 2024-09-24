@@ -1,6 +1,6 @@
 using EcommerceOrderManagement.Infrastructure.EFContext;
 
-namespace EcommerceOrderManagement.Domain.Infrastructure;
+namespace EcommerceOrderManagement.Infrastructure;
 
 public sealed class DigitacaoDbContextAccessor: IEfDbContextAccessor<OrderManagementDbContext>
 {

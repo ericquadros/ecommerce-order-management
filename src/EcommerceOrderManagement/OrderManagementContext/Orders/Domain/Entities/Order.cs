@@ -1,17 +1,19 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
+using System.Text.Json.Serialization;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
 using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.Events;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Events;
-using OrderCompletedEvent = EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Events.OrderCompletedEvent;
+using EcommerceOrderManagement.PaymentManagementContext.Payments.Application.Events;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 
 public class Order : Entity
 {
     private readonly List<OrderItem> _items;
+    [JsonIgnore]
     private readonly List<IDomainEvent<Order>> _domainEvents;
     private IEnumerable<IDiscountStrategy> _discountStrategies;
 
@@ -85,8 +87,8 @@ public class Order : Entity
 
         Status = OrderStatus.ProcessingPayment;
         
-        if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderProcessingPaymentStatusChangedEvent))))
-            _domainEvents.Add(new OrderProcessingPaymentStatusChangedEvent(this));
+        // if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderProcessingPaymentStatusChangedEvent))))
+        _domainEvents.Add(new OrderProcessingPaymentStatusChangedEvent(this));
 
         return Result.Success();
     }
@@ -131,6 +133,16 @@ public class Order : Entity
             PixPayment = (PixPayment)payment;
         else
             CardPayment = (CardPayment)payment;
+    }
+
+    public Result PaymentCompleted()
+    {
+        Status = OrderStatus.PaymentCompleted;
+        
+        if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderPaymentDoneStatusChangedEvent))))
+            _domainEvents.Add(new OrderPaymentDoneStatusChangedEvent(this));
+
+        return Result.Success();
     }
 }
 

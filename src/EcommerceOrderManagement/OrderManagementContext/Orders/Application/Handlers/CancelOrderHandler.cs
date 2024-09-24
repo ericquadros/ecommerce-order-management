@@ -1,6 +1,6 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
+using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Commands;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Application.Handlers;

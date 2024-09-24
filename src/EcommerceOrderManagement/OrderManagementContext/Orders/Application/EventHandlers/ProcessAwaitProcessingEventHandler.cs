@@ -1,11 +1,11 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
-using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Events;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
+using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
+using EcommerceOrderManagement.OrderManagementContext.Orders.Events;
 using Microsoft.EntityFrameworkCore;
 
-namespace EcommerceOrderManagement.Domain.PaymentManagementContext.Orders.Application.EventHandlers;
+namespace EcommerceOrderManagement.PaymentManagementContext.Orders.Application.EventHandlers;
 
 public class ProcessAwaitProcessingEventHandler
 {
@@ -28,10 +28,13 @@ public class ProcessAwaitProcessingEventHandler
 
         foreach (var item in order.Items)
         {
-            var productId = _context.OrderItems
-                                    .AsNoTracking()
-                                    .FirstOrDefault(i => i.Id == item.Id).ProductId;
-            item.AssignItemToProduct(productId);
+            if (item.ProductId == Guid.Empty)
+            {
+                var productId = _context.OrderItems
+                    .AsNoTracking()
+                    .FirstOrDefault(i => i.Id == item.Id).ProductId;
+                item.AssignItemToProduct(productId);
+            }
         }
 
         order.SetStatusProcessingPayment();

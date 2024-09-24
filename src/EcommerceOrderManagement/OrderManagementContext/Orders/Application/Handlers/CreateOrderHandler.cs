@@ -1,10 +1,10 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
+using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

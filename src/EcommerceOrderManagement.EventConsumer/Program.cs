@@ -1,9 +1,9 @@
-﻿using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.EventConsumer.Infrastructure;
+﻿using EcommerceOrderManagement.EventConsumer.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.Infrastructure.Interfaces;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
 using EcommerceOrderManagement.EventConsumer.PaymentManagementContext.Infrastructure.EventConsumers;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

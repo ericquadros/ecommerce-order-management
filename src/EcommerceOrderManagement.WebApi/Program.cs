@@ -1,5 +1,5 @@
 using System.Globalization;
-using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.OrderManagementContext.Endpoints;
 using FastEndpoints;

@@ -1,7 +1,7 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 
-namespace EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
+using EcommerceOrderManagement.Infrastructure;
+
+namespace EcommerceOrderManagement.OrderManagementContext.Orders.Application.Commands;
 
 public class CancelOrderCommand
 {

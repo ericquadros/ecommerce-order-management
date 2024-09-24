@@ -1,7 +1,10 @@
- {
+{
   "request": {
     "method": "POST",
-    "route": "pay/credit-card"
+    "route": "pay/credit-card",
+    "body": {
+      "pedidoId": "{{pedidoId}}"
+    }
   },
   "response": {
     "status": 200,

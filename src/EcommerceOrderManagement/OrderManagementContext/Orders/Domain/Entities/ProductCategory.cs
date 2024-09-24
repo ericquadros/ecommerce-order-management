@@ -1,4 +1,5 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
+
+using EcommerceOrderManagement.Infrastructure;
 
 namespace EcommerceOrderManagement.Migrations.Models;
 

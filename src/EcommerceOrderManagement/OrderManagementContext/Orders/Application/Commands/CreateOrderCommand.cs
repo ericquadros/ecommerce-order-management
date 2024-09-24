@@ -1,4 +1,4 @@
-using EcommerceOrderManagement.Domain.Infrastructure;
+using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.OrderManagementContext.Endpoints;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 using CardPayment = EcommerceOrderManagement.OrderManagementContext.Endpoints.CardPayment;

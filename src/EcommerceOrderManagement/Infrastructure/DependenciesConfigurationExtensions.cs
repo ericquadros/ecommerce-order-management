@@ -1,12 +1,12 @@
-using EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
-using EcommerceOrderManagement.Domain.PaymentManagementContext.Orders.Application.EventHandlers;
 using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.EventHandlers;
+using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Application.Handlers;
+using EcommerceOrderManagement.PaymentManagementContext.Orders.Application.EventHandlers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EcommerceOrderManagement.Domain.Infrastructure;
+namespace EcommerceOrderManagement.Infrastructure;
 
 public static class DependenciesConfigurationExtensions
 {
@@ -17,8 +17,8 @@ public static class DependenciesConfigurationExtensions
         services.AddScoped<CancelOrderHandler>();
         services.AddScoped<GetOrdersQueryHandler>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<ProcessProcessingPaymentEventHandler>();
         services.AddScoped<ProcessAwaitProcessingEventHandler>();
+        services.AddScoped<ProcessProcessingPaymentEventHandler>();
         
         // services.AddScoped<IEfDbContextAccessor<DigitacaoDbContextAccessor>>(); // Disabled for now
         

@@ -51,6 +51,8 @@ services:
       - db-data-order-management:/var/opt/mssql/data
     ports:
       - "1433:1433"
+    networks:
+      - infranet
 #  
 #  zookeeper:
 #    image: bitnami/zookeeper:3.8.0
@@ -135,7 +137,6 @@ services:
           "/":
             port: 8080
             dest: "/"
-
     networks:
       - infranet
 

@@ -1,6 +1,6 @@
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 
-namespace EcommerceOrderManagement.Domain.Infrastructure.Interfaces;
+namespace EcommerceOrderManagement.Infrastructure.Interfaces;
 
 public interface IMessageBroker
 {
