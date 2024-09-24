@@ -69,7 +69,8 @@ Accept: application/json
       "CardNumber": "4111111111111111",
       "CardHolder": "Daenerys Targaryen",
       "ExpirationDate": "12/25",
-      "Cvv": "123"
+      "Cvv": "123",
+      "Installments": 6
     }
   }
 }
@@ -86,3 +87,9 @@ Content-Type: application/json
 Accept: application/json
 
 {}
+
+### 
+POST http://localhost:5005/pay/credit-card
+
+###
+GET http://localhost:5005/hello/a

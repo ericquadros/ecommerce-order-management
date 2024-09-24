@@ -1,5 +1,10 @@
 using EcommerceOrderManagement.Domain.Infrastructure;
 using EcommerceOrderManagement.OrderManagementContext.Endpoints;
+using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
+using CardPayment = EcommerceOrderManagement.OrderManagementContext.Endpoints.CardPayment;
+using Customer = EcommerceOrderManagement.OrderManagementContext.Endpoints.Customer;
+using OrderItem = EcommerceOrderManagement.OrderManagementContext.Endpoints.OrderItem;
+using PixPayment = EcommerceOrderManagement.OrderManagementContext.Endpoints.PixPayment;
 
 namespace EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.Commands;
 
@@ -28,7 +33,7 @@ public class CreateOrderCommand
             ValidateCustomer(customer),
             ValidateItems(items),
             ValidateTotalAmount(totalAmount),
-            ValidatePaymentMethod(paymentDetails.Method.ToString())
+            ValidatePaymentMethod(paymentDetails.Method)
         );
 
         if (result.IsFailure)
@@ -42,7 +47,7 @@ public class CreateOrderCommand
         if (string.IsNullOrEmpty(paymentMethod))
             return Result.Failure("Payment method must be provided.");
 
-        if (paymentMethod != "Pix" && paymentMethod != "Card")
+        if (paymentMethod != OrderPaymentType.Pix.ToString() && paymentMethod != OrderPaymentType.Card.ToString())
             return Result.Failure("Invalid payment method. Only 'Pix' or 'Card' are accepted.");
 
         return Result.Success();

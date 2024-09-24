@@ -5,7 +5,7 @@ using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.EventHandlers;
+namespace EcommerceOrderManagement.Domain.PaymentManagementContext.Orders.Application.EventHandlers;
 
 public class ProcessAwaitProcessingEventHandler
 {

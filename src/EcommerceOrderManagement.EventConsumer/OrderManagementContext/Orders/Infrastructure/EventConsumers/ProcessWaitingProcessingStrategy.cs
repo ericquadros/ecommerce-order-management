@@ -1,6 +1,7 @@
 using System.Text.Json;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Events;
-using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.EventHandlers;
+using EcommerceOrderManagement.Domain.PaymentManagementContext.Orders.Application.EventHandlers;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -9,42 +10,32 @@ namespace EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.I
 public class ProcessWaitingProcessingStrategy : IKafkaEventProcessorStrategy
 {
     private readonly ProcessAwaitProcessingEventHandler _handler;
+    private readonly ILogger<ProcessWaitingProcessingStrategy> _logger;
     private const string TOPIC = "eccomerce-order-management.order-created-waiting-processing"; 
 
-    public ProcessWaitingProcessingStrategy(ProcessAwaitProcessingEventHandler handler)
+    public ProcessWaitingProcessingStrategy(
+        ProcessAwaitProcessingEventHandler handler,
+        ILogger<ProcessWaitingProcessingStrategy> logger)
     {
         _handler = handler;
+        _logger = logger;
     }
     
-    public bool CanExecute(string topic)
-    {
-        return topic == TOPIC;
-    }
+    public bool CanExecute(string topic) => topic == TOPIC; 
 
     public async Task ProcessAsync(string message)
     {
         var orderCompletedEvent = JsonConvert.DeserializeObject<OrderCompletedEvent>(message);
       
         var result = await _handler.HandleAsync(orderCompletedEvent);
-        
-        Console.WriteLine("ProcessPaymentProcessorStrategy - Processing - Customer.FirstName: " + orderCompletedEvent.Object.Customer.FirstName);
-        Console.WriteLine("ProcessPaymentProcessorStrategy - Processing - Order.Status: " + orderCompletedEvent.Object.Status);
+
+        _logger.LogInformation($"ProcessPaymentProcessorStrategy - Processing - Customer.FirstName: {orderCompletedEvent.Object.Customer.FirstName}");
+        _logger.LogInformation($"ProcessPaymentProcessorStrategy - Processing - Order.Status: {orderCompletedEvent.Object.Status}");
         
         if (result.IsFailure)
-            Console.WriteLine("Falha!!!");
+            _logger.LogError("Failed to executing processing!!");
         
         await Task.CompletedTask;
     }
-    
-    private record CardPayment(
-        string CardNumber,
-        string CardHolder,
-        string ExpirationDate,
-        string CVV,
-        string OrderId,
-        string Id,
-        DateTime CreatedAt,
-        DateTime UpdatedAt
-    );
 }
 

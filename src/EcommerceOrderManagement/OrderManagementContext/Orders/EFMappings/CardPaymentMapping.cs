@@ -29,7 +29,7 @@ public class CardPaymentMapping : IEntityTypeConfiguration<CardPayment>
             .HasColumnType("varchar(5)")
             .HasMaxLength(5); // Format MM/AA
 
-        builder.Property(cp => cp.CVV)
+        builder.Property(cp => cp.Cvv)
             .IsRequired()
             .HasColumnType("varchar(4)")
             .HasMaxLength(4);

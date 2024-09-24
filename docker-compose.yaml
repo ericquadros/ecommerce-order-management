@@ -149,6 +149,18 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - infranet
+        
+  mockaco:
+    image: natenho/mockaco
+    container_name: mockaco-api
+    ports:
+      - "5055:5000"
+    volumes:
+      - ./tests/mocks/containerApiMocks:/app/Mocks
+    environment:
+      - MOCKS_DIR=/app/Mocks
+    networks:
+      - infranet
 
 networks:
   infranet:

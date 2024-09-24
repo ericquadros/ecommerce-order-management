@@ -9,6 +9,8 @@ public class CardPayment
     public string Cvv { get; set; }
     public Guid OrderId { get; set; }
     public Order Order { get; set; }
+    
+    public int Installments { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

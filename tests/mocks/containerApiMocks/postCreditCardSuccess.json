@@ -1,0 +1,14 @@
+ {
+  "request": {
+    "method": "POST",
+    "route": "pay/credit-card"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "status": "success",
+      "transactionId": "{{guid}}",
+      "message": "Credit card payment processed"
+    }
+  }
+}

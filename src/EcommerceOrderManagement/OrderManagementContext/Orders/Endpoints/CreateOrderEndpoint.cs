@@ -74,5 +74,6 @@ public record CardPayment(
     string CardNumber,
     string CardHolder,
     string ExpirationDate,
-    string Cvv
+    string Cvv,
+    int Installments
 );

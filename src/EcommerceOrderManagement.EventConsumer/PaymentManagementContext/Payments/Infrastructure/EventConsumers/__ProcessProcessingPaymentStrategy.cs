@@ -4,12 +4,12 @@ using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Applicat
 
 namespace EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
 
-public class ProcessPaymentProcessorStrategy : IKafkaEventProcessorStrategy
+public class __ProcessProcessingPaymentStrategy : IKafkaEventProcessorStrategy
 {
     private const string TOPIC = "eccomerce.order-management-context.order-processing-paymet-status-changed";
-    private readonly AjustarPaymentProcessingEventHandler _handler;
+    private readonly ProcessProcessingPaymentEventHandler _handler;
 
-    public ProcessPaymentProcessorStrategy(AjustarPaymentProcessingEventHandler handler)
+    public __ProcessProcessingPaymentStrategy(ProcessProcessingPaymentEventHandler handler)
     {
         _handler = handler;
     }

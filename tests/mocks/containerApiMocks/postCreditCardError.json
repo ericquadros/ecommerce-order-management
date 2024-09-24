@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "route": "pay/credit-card"
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "status": "error",
+      "message": "Invalid credit card number"
+    }
+  }
+}

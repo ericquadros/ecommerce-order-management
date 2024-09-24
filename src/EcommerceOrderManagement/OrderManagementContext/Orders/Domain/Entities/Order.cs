@@ -114,9 +114,10 @@ public class Order : Entity
 
         // Apply all discount strategies
         foreach (var strategy in _discountStrategies)
-        {
             totalDiscount += strategy.ApplyDiscount(this);
-        }
+
+        if (PixPayment is not null)
+            totalDiscount += PixPayment.ApplyDiscount(TotalAmount);
 
         DiscountAmount = totalDiscount;
         TotalAmount -= DiscountAmount;

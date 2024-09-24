@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="NotificationsContext\" />
       <Folder Include="OrderManagementContext\Orders\Application\Validators\" />
       <Folder Include="OrderManagementContext\Orders\Domain\Repositories\" />
       <Folder Include="OrderManagementContext\Orders\Domain\Services\" />

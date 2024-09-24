@@ -1,9 +1,9 @@
 ﻿using EcommerceOrderManagement.Domain.Infrastructure;
-using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.EventHandlers;
 using EcommerceOrderManagement.EventConsumer.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.Infrastructure.Interfaces;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
+using EcommerceOrderManagement.EventConsumer.PaymentManagementContext.Infrastructure.EventConsumers;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +20,10 @@ public class Program
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true, true)
             .AddJsonFile($"appsettings.{environment}.json", true, true)
             .AddJsonFile("appsettings.OrderManagement.json", true, true)
             .AddJsonFile("appsettings.Payment.json", true, true)
+            .AddJsonFile("appsettings.json", true, true)
             .Build();
 
         Log.Logger = new LoggerConfiguration()
@@ -82,6 +82,6 @@ public static class ServiceExtensions
         // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>();
         // services.AddScoped<IKafkaEventProcessorStrategy, OrderEventProcessorStrategy>();
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingProcessingStrategy>();
-        // services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentProcessorStrategy>(); // TODO: Uncomment
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessProcessingPaymentStrategy>();
     }
 }

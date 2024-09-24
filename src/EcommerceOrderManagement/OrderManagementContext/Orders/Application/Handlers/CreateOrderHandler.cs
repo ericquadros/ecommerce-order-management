@@ -20,9 +20,7 @@ public class CreateOrderHandler(
         CancellationToken cancellationToken)
     {
         // Find or create a new customer
-        var customer = await context.Customers
-                           .FirstOrDefaultAsync(c => c.Email.Address == command.Customer.Email, cancellationToken)
-                       ?? new Customer(command.Customer.FirstName, command.Customer.LastName, new Email(command.Customer.Email), command.Customer.Phone);
+        var customer = await GetOrCreateCustomer(command, cancellationToken);
         
         var orderItems = new List<OrderItem>();
         orderItems.AddRange(command.Items.Select(i => new OrderItem(new Guid(i.ProductId), i.Quantity, i.Price)));
@@ -57,7 +55,14 @@ public class CreateOrderHandler(
             order.Status.ToString(),
             order.TotalAmount);
     }
-    
+
+    private async Task<Customer> GetOrCreateCustomer(CreateOrderCommand command, CancellationToken cancellationToken)
+    {
+        return await context.Customers
+                           .FirstOrDefaultAsync(c => c.Email.Address == command.Customer.Email, cancellationToken)
+                       ?? new Customer(command.Customer.FirstName, command.Customer.LastName, new Email(command.Customer.Email), command.Customer.Phone);
+    }
+
     private async Task<Result> ValidateIfExistsProducts(IEnumerable<OrderItem> items, OrderManagementDbContext context, CancellationToken cancellationToken)
     {
         var productIds = items.Select(i => i.ProductId).ToList();
@@ -73,7 +78,7 @@ public class CreateOrderHandler(
     
     private Result<IPayment> ValidateAndCreatePayment(CreateOrderCommand command, Order order)
     {
-        if (command.PaymentMethod == OrderPaymentType.Pix.ToString() && command.PixPayment != null)
+        if (command.PaymentMethod == OrderPaymentType.Pix.ToString() && command.PixPayment is not null)
         {
             var pixPayment = new PixPayment(
                 command.PixPayment.TransactionId,
@@ -81,14 +86,14 @@ public class CreateOrderHandler(
             );
             return pixPayment;
         }
-        if (command.PaymentMethod == OrderPaymentType.Card.ToString() && command.CardPayment != null)
+        if (command.PaymentMethod == OrderPaymentType.Card.ToString() && command.CardPayment is not null)
         {
-            // Criar a instância do pagamento Cartão
             var cardPayment = new CardPayment(
                 command.CardPayment.CardNumber,
                 command.CardPayment.CardHolder,
                 command.CardPayment.ExpirationDate,
                 command.CardPayment.Cvv,
+                command.CardPayment.Installments,
                 order.Id
             );
             return cardPayment;
@@ -106,3 +111,4 @@ public record CreateOrderResponse(
     string OrderId,
     string Status,
     decimal TotalAmount);
+    
