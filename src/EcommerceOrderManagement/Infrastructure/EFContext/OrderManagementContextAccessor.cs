@@ -2,20 +2,20 @@ using EcommerceOrderManagement.Infrastructure.EFContext;
 
 namespace EcommerceOrderManagement.Infrastructure;
 
-public sealed class DigitacaoDbContextAccessor: IEfDbContextAccessor<OrderManagementDbContext>
+public sealed class OrderManagementContextAccessor : IEfDbContextAccessor<OrderManagementDbContext>
 {
-    private OrderManagementDbContext _contexto = null!;
-    private bool _disposed = false;
+    private readonly AsyncLocal<OrderManagementDbContext> _contextAccessor = new();
+    private bool _disposed;
 
     public OrderManagementDbContext Get()
     {
-        return _contexto ?? throw new InvalidOperationException("Contexto must be registered!");
+        return _contextAccessor.Value ?? throw new InvalidOperationException("Contexto must be registered!");
     }
 
     public void Register(OrderManagementDbContext context)
     {
         _disposed = false;
-        _contexto = context ?? throw new ArgumentNullException(nameof(context));
+        _contextAccessor.Value = context ?? throw new ArgumentNullException(nameof(context));
     }
 
     public void Clear()
@@ -26,7 +26,6 @@ public sealed class DigitacaoDbContextAccessor: IEfDbContextAccessor<OrderManage
     public void Dispose()
     {
         Dispose(true);
-        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
         GC.SuppressFinalize(this);
     }
 
@@ -36,9 +35,9 @@ public sealed class DigitacaoDbContextAccessor: IEfDbContextAccessor<OrderManage
             return;
 
         if (disposing)
-            _contexto?.Dispose();
+            _contextAccessor.Value?.Dispose();
 
-        _contexto = null!;
+        _contextAccessor.Value = null!;
         _disposed = true;
     }
 }

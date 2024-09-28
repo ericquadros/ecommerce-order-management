@@ -8,7 +8,7 @@ using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Events;
 using EcommerceOrderManagement.PaymentManagementContext.Payments.Application.Events;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json.Converters;
 
 namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 
@@ -39,6 +39,8 @@ public class Order : Entity
     public Customer Customer { get; private set; }
     public IReadOnlyList<OrderItem> Items => _items;
     public decimal TotalAmount { get; private set; }
+    
+    [JsonConverter(typeof(JsonConverter<OrderStatus>))]
     public OrderStatus Status  { get; private set; }
     public DateTime OrderDate { get; private set; }
     
@@ -62,9 +64,7 @@ public class Order : Entity
     public void AssignOrderIdToItems()
     {
         foreach (var item in _items)
-        {
             item.AssignItemToOrder(Id);
-        }
     }
 
     public Result CompleteOrder()
@@ -89,7 +89,7 @@ public class Order : Entity
         return Result.Success();
     }
     
-    public Result SetStatusProcessingPayment()
+    public Result ProcessingPayment()
     {
         if (Status != OrderStatus.AwaitingProcessing)
             return Result.Failure("The status should be AwaitingProcessing");
@@ -105,7 +105,7 @@ public class Order : Entity
         return Result.Success();
     }
 
-    public Result SetStatusPickingOrder()
+    public Result PickingOrder()
     {
         // StringToDateOnlyConverter: REMOVE
         // if (Status != OrderStatus.PaymentCompleted)
@@ -117,7 +117,7 @@ public class Order : Entity
         return Result.Success();
     }
     
-    public Result SetStatusAwaitingStock()
+    public Result AwaitingStock()
     {
         if (Status != OrderStatus.PickingOrder) 
             return Result.Failure("The status should be PickingOrder");
@@ -159,7 +159,7 @@ public class Order : Entity
         TotalAmount -= DiscountAmount;
     }
 
-    public decimal DiscountAmount { get; set; }
+    public decimal DiscountAmount { get; private set; }
 
     public void SetPayment(IPayment payment)
     {

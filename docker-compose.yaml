@@ -1,44 +1,46 @@
 services:
-#  app:
-#    environment:
-#      - ASPNETCORE_ENVIRONMENT=Development
-#      - SEED_DATABASE=true
-#    volumes:
-#      - ./appsettings.json:/app/appsettings.json
-#    depends_on:
-#      - db
-#    build:
-#      context: .
-#    ports:
-#      - "5000:80"
+  kafka:
+    image: wurstmeister/kafka:latest
+    restart: on-failure
+    ports:
+      - 9092:9092  # Porta externa para conexão com Kafka
+      - 9093:9093  # Porta interna para comunicação entre brokers
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_NUM_PARTITIONS=3
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+
+      # Configuração dos listeners
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT_INTERNAL  # Comunicação entre brokers
+
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+      - 2181:2181
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
   
-#  
-#  consumer-order-management:
-#    image: ecommerce-order-consumer:latest # Adjust for running with context
-#    container_name: consumer-order-management
-#    environment:
-#      - ASPNETCORE_ENVIRONMENT=Development
-#      - DOTNET_RUNNING_IN_CONTAINER=true
-#      - Kafka__Topic=OrderTopic
-#    volumes:
-#      - ./appsettings.OrderManagement.json:/app/appsettings.json
-#    depends_on:
-#      - kafka
-#    restart: always
-#
-#  consumer-payment:
-#    image: ecommerce-order-consumer:latest # Adjust for running with context
-#    container_name: consumer-payment
-#    environment:
-#      - ASPNETCORE_ENVIRONMENT=Development
-#      - DOTNET_RUNNING_IN_CONTAINER=true
-#      - Kafka__Topic=PaymentTopic
-#    volumes:
-#      - ./appsettings.PaymentManagement.json:/app/appsettings.json
-#    depends_on:
-#      - kafka
-#    restart: always
-  
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+      - zookeeper
+    ports:
+      - "8090:8080"  # Kafka UI acessível na porta 8080 do host
+    restart: always
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9093  # Conecta ao Kafka pelo nome do serviço
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
   db:
     container_name: db
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -51,105 +53,6 @@ services:
       - db-data-order-management:/var/opt/mssql/data
     ports:
       - "1433:1433"
-    networks:
-      - infranet
-#  
-#  zookeeper:
-#    image: bitnami/zookeeper:3.8.0
-#    container_name: zookeeper
-#    environment:
-#      - ALLOW_ANONYMOUS_LOGIN=yes
-#    ports:
-#      - "2181:2181"
-#   
-#  kafka:
-#    image: bitnami/kafka:3.3.1
-#    container_name: kafka
-#    environment:
-#      - KAFKA_ENABLE_KRAFT=yes
-#      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-#      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-#      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-#      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:2181
-#      - KAFKA_BROKER_ID=1
-#      - ALLOW_PLAINTEXT_LISTENER=yes
-#      - KAFKA_CFG_NODE_ID=1
-#      - KAFKA_KRAFT_CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
-#      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@localhost:9092
-#    depends_on:
-#      - zookeeper
-#    ports:
-#      - "9092:9092"
-#
-#  kafkaui:
-#    container_name: kafka-ui
-#    image: "provectuslabs/kafka-ui:latest"
-#    ports:
-#      - "28080:8080"
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.4"
-#          memory: 350M
-#    environment:
-#      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9092
-#      KAFKA_CLUSTERS_0_NAME: KafkaCluster
-#    depends_on:
-#      - kafka
-#             
-
-  kafka:
-    image: "bitnami/kafka:3.3.1"
-    container_name: kafka
-    hostname: kafka.dev-local.bemdev.com.br
-    environment:
-      - KAFKA_ENABLE_KRAFT=yes
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:2181
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka.dev-local.bemdev.com.br:9092
-      - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka.dev-local.bemdev.com.br:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_KRAFT_CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
-    ports:
-      - 9092:9092
-    networks:
-      - infranet
-
-  kafkaui:
-    container_name: kafka-ui
-    image: "provectuslabs/kafka-ui:latest"
-    ports:
-      - "28080:8080"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.4"
-          memory: 350M
-    environment:
-      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka.dev-local.bemdev.com.br:9092
-      KAFKA_CLUSTERS_0_NAME: MkU3OEVBNTcwNTJENDM2Qk
-      VIRTUAL_HOST_MULTIPORTS: |-
-        kafka-ui.dev-local.bemdev.com.br:
-          "/":
-            port: 8080
-            dest: "/"
-    networks:
-      - infranet
-
-  ingress:
-    image: jwilder/nginx-proxy
-    container_name: ingress
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    networks:
-      - infranet
         
   mockaco:
     image: natenho/mockaco
@@ -160,12 +63,6 @@ services:
       - ./tests/mocks/containerApiMocks:/app/Mocks
     environment:
       - MOCKS_DIR=/app/Mocks
-    networks:
-      - infranet
-
-networks:
-  infranet:
-    external: true
-
+    
 volumes:
   db-data-order-management:      

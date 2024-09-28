@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace EcommerceOrderManagement.Infrastructure;
@@ -20,10 +21,8 @@ public class MessageBrokerService : IMessageBroker
     {
         try
         {
-            if (domainEvent is null)
-                return;
-            
             var bootstrapServers = _configuration.GetValue<string>("Kafka:BootstrapServers");
+            var shoudVerifyTopicExists = _configuration.GetValue<bool>("Kafka:ShoudVerifyTopicExists");
             var config = new ProducerConfig
             {
                 BootstrapServers = bootstrapServers
@@ -32,33 +31,36 @@ public class MessageBrokerService : IMessageBroker
             // Obtendo o nome do tópico a partir do EventName usando o enum
             if (Enum.TryParse<EventTypes>(domainEvent.EventName, out var eventType))
             {
-                // Get topic name from json appsettings
-                var topic = GetEventTopic(eventType);
-
-                KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
-        
-                var producer = new ProducerBuilder<Null, string>(config).Build();
+                var topic = GetEventTopic(eventType); // Get topic name from json appsettings
+                if (string.IsNullOrEmpty(topic))
+                    throw new ArgumentException($"Topic not found for event name: {domainEvent.EventName} in appsettings.");
                 
+                if (shoudVerifyTopicExists) 
+                    KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
+        
                 var jsonSettings = new JsonSerializerSettings
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignorar referências circulares
                     NullValueHandling = NullValueHandling.Ignore // Ignorar valores nulos
                 };
-                // Serializa o evento, evitando as referências e eventos
+                
                 var domainEventJson = JsonConvert.SerializeObject(domainEvent, jsonSettings);
+                _logger.LogInformation($"Serialized event: {domainEventJson}");
 
+                using var producer = new ProducerBuilder<Null, string>(config).Build();
                 await producer.ProduceAsync(topic, new Message<Null, string> 
                 { 
                     Value = domainEventJson 
                 });
+                // producer.Flush(TimeSpan.FromSeconds(10));
             }
             else
                 throw new ArgumentException($"Event type {domainEvent.EventName} is not recognized.");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw e;
+            _logger.LogError(e.ToString());
+            throw;
         }
     }
     

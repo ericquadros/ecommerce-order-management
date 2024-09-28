@@ -27,7 +27,7 @@ public class ProcessPaymentDoneEventHandler
     {
         var order = orderEvent.Object;
         
-        var result = order.SetStatusPickingOrder();
+        var result = order.PickingOrder();
         if (result.IsFailure)
             return null;
         

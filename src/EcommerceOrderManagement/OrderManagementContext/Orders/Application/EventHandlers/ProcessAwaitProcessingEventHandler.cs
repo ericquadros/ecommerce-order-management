@@ -9,38 +9,39 @@ namespace EcommerceOrderManagement.PaymentManagementContext.Orders.Application.E
 
 public class ProcessAwaitProcessingEventHandler
 {
-    private readonly OrderManagementDbContext _context;
+    private readonly IDbContextFactory _dbContextFactory;
     private readonly IMessageBroker _brokerService;
 
     public ProcessAwaitProcessingEventHandler(
-        OrderManagementDbContext context, 
+        IDbContextFactory dbContextFactory, 
         IMessageBroker brokerService)
     {
-        _context = context;
+        _dbContextFactory = dbContextFactory;
         _brokerService = brokerService;
     }
 
     public async Task<Result<Order>> HandleAsync(OrderCompletedEvent orderCompletedEvent)
     {
+        using var context = _dbContextFactory.CreateDbContext();
         var order = orderCompletedEvent?.Object;
         if (order is null)
             return Result.Failure("Order cannot be null");
 
         foreach (var item in order.Items)
         {
-            if (item.ProductId == Guid.Empty)
+            if (item.ProductId == Guid.Empty) // TODO: REMOVE
             {
-                var productId = _context.OrderItems
+                var productId = context.OrderItems
                     .AsNoTracking()
                     .FirstOrDefault(i => i.Id == item.Id).ProductId;
                 item.AssignItemToProduct(productId);
             }
         }
 
-        order.SetStatusProcessingPayment();
+        order.ProcessingPayment();
 
-        _context.Orders.Update(order);
-        await _context.SaveChangesAsync();
+        context.Orders.Update(order);
+        await context.SaveChangesAsync();
         
         // Publishing domain events
         foreach (var domainEvent in order.Events)

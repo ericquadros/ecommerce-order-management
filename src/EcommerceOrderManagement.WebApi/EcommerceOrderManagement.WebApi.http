@@ -9,7 +9,7 @@ Accept: application/json
 
 {
   "Customer": {
-    "FirstName": "Joao",
+    "FirstName": "John",
     "LastName": "Snow",
     "Email": "john.snow@winterfell.com",
     "Phone": "123-456-7890"
@@ -82,26 +82,107 @@ Accept: application/json
 
 ###
 ## Cancel an order
-DELETE {{EcommerceOrderManagement.WebApi_HostAddress}}/orders/{{EcommerceOrderManagement.OrderIdToCancel}}/cancel
+POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders/{{EcommerceOrderManagement.OrderIdToCancel}}/cancel
 Content-Type: application/json
 Accept: application/json
 
 {}
 
+#### Testing mock routes
 ### 
 POST http://localhost:5055/pay/credit-card
 
 {
-   "pedidoId": "aaaa"
+   "pedidoId": "abcd"
 }
 
 ### 
 POST http://localhost:5055/pay/pix
 
 {
-   "pedidoId": "abc"
+   "pedidoId": "abcd"
 }
 
 
 ###
 GET http://localhost:5005/hello/a
+
+#### Other orders of customers
+
+###
+## Create an order with eletronics products with card
+POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Customer": {
+    "FirstName": "Ned",
+    "LastName": "Stark",
+    "Email": "ned.stark@winterfell.com",
+    "Phone": "123-456-7890"
+  },
+  "Items": [
+    {
+      "ProductId": "0350ab23-28e1-4bb3-227d-08dcda5a2e50",
+      "Quantity": 2,
+      "Price": 4099.99
+    },
+    {
+      "ProductId": "8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf",
+      "Quantity": 1,
+      "Price": 999.99
+    }
+  ],
+  "TotalAmount": 9199.97,
+  "Payment": {
+    "Method": "Card",
+    "Pix": null,
+    "Card": {
+      "CardNumber": "4111111111111111",
+      "CardHolder": "Daenerys Targaryen",
+      "ExpirationDate": "12/25",
+      "Cvv": "123",
+      "Installments": 6
+    }
+  }
+}
+
+###
+## Create an order with eletronics products with card
+POST {{EcommerceOrderManagement.WebApi_HostAddress}}/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Customer": {
+    "FirstName": "Jose",
+    "LastName": "Carlos Silva",
+    "Email": "jose.carlos.silva@winterfell.com",
+    "Phone": "123-456-7890"
+  },
+  "Items": [
+    {
+      "ProductId": "0350ab23-28e1-4bb3-227d-08dcda5a2e50",
+      "Quantity": 2,
+      "Price": 4099.99
+    },
+    {
+      "ProductId": "8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf",
+      "Quantity": 1,
+      "Price": 999.99
+    }
+  ],
+  "TotalAmount": 9199.97,
+  "Payment": {
+    "Method": "Card",
+    "Pix": null,
+    "Card": {
+      "CardNumber": "4111111111111111",
+      "CardHolder": "Daenerys Targaryen",
+      "ExpirationDate": "12/25",
+      "Cvv": "123",
+      "Installments": 6
+    }
+  }
+}

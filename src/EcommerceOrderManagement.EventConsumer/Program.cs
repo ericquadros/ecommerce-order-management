@@ -73,6 +73,8 @@ public static class ServiceExtensions
         var connectionString = configuration.GetConnectionString("OrderManagementDatabase");
         services.AddDbContext<OrderManagementDbContext>(options =>
             options.UseSqlServer(connectionString));
+        services.AddScoped<IEfDbContextAccessor<OrderManagementDbContext>, OrderManagementContextAccessor>();
+        services.AddScoped<IDbContextFactory, OrderManagementDbContextFactory>();
 
         services.ConfigureDomainDependenciesServices();
         // Register your services here
@@ -83,5 +85,6 @@ public static class ServiceExtensions
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessWaitingProcessingStrategy>();
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessProcessingPaymentStrategy>();
         services.AddScoped<IKafkaEventProcessorStrategy, ProcessPaymentDoneStrategy>();
+        services.AddScoped<IKafkaEventProcessorStrategy, ProcessPickingOrdersStrategy>();
     }
 }

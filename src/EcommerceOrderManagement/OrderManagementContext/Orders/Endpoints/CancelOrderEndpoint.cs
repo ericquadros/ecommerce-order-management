@@ -16,7 +16,7 @@ public class CancelOrderEndpoint : Endpoint<CancelOrderRequest>
     
     public override void Configure()
     {
-        Delete("/orders/{OrderId}/cancel");
+        Post("/orders/{OrderId}/cancel");
         AllowAnonymous();
     }
 

@@ -11,7 +11,7 @@ public class ProcessWaitingProcessingStrategy : IKafkaEventProcessorStrategy
 {
     private readonly ProcessAwaitProcessingEventHandler _handler;
     private readonly ILogger<ProcessWaitingProcessingStrategy> _logger;
-    private const string TOPIC = "ecommerce-order-management.order-created-waiting-processing"; 
+    private const string TOPIC = "e-order-management.order-created-waiting-processing"; 
 
     public ProcessWaitingProcessingStrategy(
         ProcessAwaitProcessingEventHandler handler,
@@ -28,9 +28,10 @@ public class ProcessWaitingProcessingStrategy : IKafkaEventProcessorStrategy
         var orderCompletedEvent = JsonConvert.DeserializeObject<OrderCompletedEvent>(message);
         
         var result = await _handler.HandleAsync(orderCompletedEvent);
-
+        
+        _logger.LogInformation("");
         _logger.LogInformation($"ProcessWaitingProcessingStrategy - Processing - Customer.FirstName: {orderCompletedEvent.Object.Customer.FirstName}");
-        _logger.LogInformation($"ProcessWaitingProcessingStrategy - Processing - Order.Status: {orderCompletedEvent.Object.Status}");
+        _logger.LogInformation($"ProcessWaitingProcessingStrategy - Processing - EventName: {orderCompletedEvent.EventName}");
         
         if (result.IsFailure)
             _logger.LogError("Failed to executing processing!!");

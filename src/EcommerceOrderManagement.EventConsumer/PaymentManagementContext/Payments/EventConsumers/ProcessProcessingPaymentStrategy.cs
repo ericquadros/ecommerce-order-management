@@ -11,7 +11,7 @@ public class ProcessProcessingPaymentStrategy : IKafkaEventProcessorStrategy
     private readonly ProcessProcessingPaymentEventHandler _handler;
     
     private readonly ILogger<ProcessWaitingProcessingStrategy> _logger;
-    private const string TOPIC = "ecommerce-order-management.order-processing-payment-status-changed";
+    private const string TOPIC = "e-order-management.order-processing-payment-status-changed";
     
     public ProcessProcessingPaymentStrategy(
         ProcessProcessingPaymentEventHandler handler,
@@ -28,11 +28,12 @@ public class ProcessProcessingPaymentStrategy : IKafkaEventProcessorStrategy
         var orderEvent = JsonConvert.DeserializeObject<OrderProcessingPaymentStatusChangedEvent>(message);
         var result = await _handler.HandleAsync(orderEvent);
         
+        _logger.LogInformation("");
         _logger.LogInformation($"ProcessProcessingPaymentStrategy - Processing - Customer.FirstName: {orderEvent.Object.Customer.FirstName}");
-        _logger.LogInformation($"ProcessProcessingPaymentStrategy - Processing - Order.Status: {orderEvent.Object.Status}");
+        _logger.LogInformation($"ProcessProcessingPaymentStrategy - Processing - EventName: {orderEvent.EventName}");
         
         if (result.IsFailure)
-            _logger.LogError("Failed to executing processing!!");
+            _logger.LogError("ProcessProcessingPaymentStrategy - Failed to executing processing!!");
         
         await Task.CompletedTask;
     }

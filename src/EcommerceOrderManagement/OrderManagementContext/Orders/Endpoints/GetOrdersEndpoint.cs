@@ -20,6 +20,12 @@ public class GetOrdersEndpoint : Endpoint<EmptyRequest>
     {
         Get("/orders");
         AllowAnonymous();
+        Summary(s =>
+        {
+            s.Summary = "Get a list of orders";
+            s.Description = "Retrieve a paginated list of orders.";
+            s.ExampleRequest = new GetOrdersRequest(1, 20);
+        });
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
@@ -32,8 +38,8 @@ public class GetOrdersEndpoint : Endpoint<EmptyRequest>
         page = page != 0  ? page : defaultFirstPage;
         pageSize = pageSize != 0  ? pageSize : defaultPageSize;
 
-         var result = await _handler.Handle(page, pageSize, cancellationToken);
-        
+        var result = await _handler.Handle(page, pageSize, cancellationToken);
+
         if (result.IsFailure)
         {
             await SendAsync(new { Error = result.Error }, 400, cancellationToken);
@@ -43,3 +49,5 @@ public class GetOrdersEndpoint : Endpoint<EmptyRequest>
         await SendOkAsync(new { Data = result.Value }, cancellationToken);
     }
 }
+
+public record GetOrdersRequest([FromQuery] int? Page,  [FromQuery] int? PageSize);

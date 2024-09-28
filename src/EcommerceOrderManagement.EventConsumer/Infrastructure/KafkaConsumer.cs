@@ -1,6 +1,8 @@
 using Confluent.Kafka.Admin;
 using EcommerceOrderManagement.EventConsumer.Infrastructure.Interfaces;
 using EcommerceOrderManagement.EventConsumer.OrderManagementContext.Orders.Infrastructure.EventConsumers;
+using EcommerceOrderManagement.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace EcommerceOrderManagement.EventConsumer.Infrastructure;
@@ -13,11 +15,17 @@ using System.Threading.Tasks;
 public class KafkaConsumer : IKafkaConsumer
 {
     private readonly IEnumerable<IKafkaEventProcessorStrategy> _strategies;
+    private readonly IConfiguration _configuration;
     private readonly KafkaSettings _settings;
     private readonly ILogger _logger;
 
-    public KafkaConsumer(KafkaSettings settings, ILogger<KafkaConsumer> logger, IEnumerable<IKafkaEventProcessorStrategy> strategies)
+    public KafkaConsumer(
+        IConfiguration configuration,
+        KafkaSettings settings, 
+        ILogger<KafkaConsumer> logger, 
+        IEnumerable<IKafkaEventProcessorStrategy> strategies)
     {
+        _configuration = configuration;
         _settings = settings;
         _logger = logger;
         _strategies = strategies;
@@ -31,6 +39,7 @@ public class KafkaConsumer : IKafkaConsumer
             GroupId = _settings.ConsumerGroupId,
             AutoOffsetReset = _settings.AutoOffsetReset
         };
+        await KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
 
         using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
         {

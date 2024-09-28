@@ -16,7 +16,7 @@ public class PixPaymentMapping : IEntityTypeConfiguration<PixPayment>
         builder.Property(pp => pp.TransactionId)
             .IsRequired()
             .HasColumnType("varchar(100)")
-            .HasMaxLength(100); // Ajuste o tamanho conforme necessário
+            .HasMaxLength(100);
         
         builder.Property(o => o.CreatedAt)
             .HasColumnType("datetime");

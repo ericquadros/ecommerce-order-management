@@ -41,19 +41,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 var connectionString = builder.Configuration.GetConnectionString("OrderManagementDatabase");
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IEfDbContextAccessor<OrderManagementDbContext>, OrderManagementContextAccessor>();
+builder.Services.AddScoped<IDbContextFactory, OrderManagementDbContextFactory>();
 
 builder.Services.ConfigureDomainDependenciesServices();
 
 var app = builder.Build();
-
-app.MapGet("/culture", () => 
-{
-    return new 
-    {
-        CurrentCulture = CultureInfo.CurrentCulture.Name,
-        CurrentUICulture = CultureInfo.CurrentUICulture.Name
-    };
-});
 
 if (app.Environment.IsDevelopment())
 {
@@ -66,9 +59,19 @@ app.UseHttpsRedirection();
 
 app.UseFastEndpoints();
 
+// AddEndpointCulture(app);
+// KafkaTestCommunication.Execute("web-api");
+
 app.Run();
 
-// record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-// {
-//     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-// }
+void AddEndpointCulture(WebApplication webApplication)
+{
+    webApplication.MapGet("/culture", () => 
+    {
+        return new 
+        {
+            CurrentCulture = CultureInfo.CurrentCulture.Name,
+            CurrentUICulture = CultureInfo.CurrentUICulture.Name
+        };
+    });
+}
