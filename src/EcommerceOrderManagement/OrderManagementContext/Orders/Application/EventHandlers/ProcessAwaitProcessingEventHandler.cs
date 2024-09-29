@@ -1,52 +1,48 @@
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.OrderManagementContext.Orders.Events;
-using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceOrderManagement.PaymentManagementContext.Orders.Application.EventHandlers;
 
 public class ProcessAwaitProcessingEventHandler
 {
-    private readonly IDbContextFactory _dbContextFactory;
+    private readonly OrderRepository _orderRepository;
     private readonly IMessageBroker _brokerService;
 
     public ProcessAwaitProcessingEventHandler(
-        IDbContextFactory dbContextFactory, 
+        OrderRepository orderRepository,
         IMessageBroker brokerService)
     {
-        _dbContextFactory = dbContextFactory;
+        _orderRepository = orderRepository;
         _brokerService = brokerService;
     }
 
-    public async Task<Result<Order>> HandleAsync(OrderCompletedEvent orderCompletedEvent)
+    public async Task<Result<Order>> HandleAsync(OrderCompletedEvent orderEvent)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-        var order = orderCompletedEvent?.Object;
-        if (order is null)
-            return Result.Failure("Order cannot be null");
-
-        foreach (var item in order.Items)
+        try
         {
-            if (item.ProductId == Guid.Empty) // TODO: REMOVE
-            {
-                var productId = context.OrderItems
-                    .AsNoTracking()
-                    .FirstOrDefault(i => i.Id == item.Id).ProductId;
-                item.AssignItemToProduct(productId);
-            }
-        }
+            if (orderEvent?.Object?.Id is null)
+                return Result.Failure("The order is not setted in the event.");
 
-        order.ProcessingPayment();
+            var order = await _orderRepository.GetOrderCompleteAsync(orderEvent?.Object?.Id);
 
-        context.Orders.Update(order);
-        await context.SaveChangesAsync();
+            order.ProcessingPayment();
+
+            await _orderRepository.UpdateOrderAsync(order);
         
-        // Publishing domain events
-        foreach (var domainEvent in order.Events)
-            await _brokerService.ProduceMessageAsync(domainEvent);
+            // Publishing domain events
+            foreach (var domainEvent in order.Events)
+                await _brokerService.ProduceMessageAsync(domainEvent);
 
-        return order;
+            return order;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

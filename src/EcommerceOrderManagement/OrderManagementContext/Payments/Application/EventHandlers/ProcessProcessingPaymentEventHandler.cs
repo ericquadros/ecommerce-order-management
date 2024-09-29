@@ -1,3 +1,4 @@
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.Infrastructure.Http;
@@ -11,19 +12,19 @@ namespace EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Appl
 
 public class ProcessProcessingPaymentEventHandler
 {
-    private readonly OrderManagementDbContext _context;
+    private readonly OrderRepository _orderRepository;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProcessProcessingPaymentEventHandler> _logger;
     private readonly IMessageBroker _messageBroker;
     private string checkoutPaymentsHttp;
 
     public ProcessProcessingPaymentEventHandler(
-        OrderManagementDbContext context,
+        OrderRepository orderRepository,
         IConfiguration configuration,
         ILogger<ProcessProcessingPaymentEventHandler> logger,
         IMessageBroker messageBroker)
     {
-        _context = context;
+        _orderRepository = orderRepository;
         _configuration = configuration;
         _logger = logger;
         _messageBroker = messageBroker;
@@ -35,7 +36,11 @@ public class ProcessProcessingPaymentEventHandler
 
     public async Task<Result<Order>> HandleAsync(OrderProcessingPaymentStatusChangedEvent orderEvent)
     {
-        var order = orderEvent.Object;
+        if (orderEvent?.Object?.Id is null)
+            return Result.Failure("The order is not setted in the event.");
+
+        var order = await _orderRepository.GetOrderCompleteAsync(orderEvent?.Object?.Id);
+        
         Result<Order> result;
 
         if (order.PixPayment is not null)
@@ -48,9 +53,8 @@ public class ProcessProcessingPaymentEventHandler
         if (result.IsSuccess)
         {
             order.PaymentCompleted();
-            
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
+
+            await _orderRepository.UpdateOrderAsync(order);
             
             // Publishing domain events
             foreach (var domainEvent in order.Events)
@@ -62,8 +66,7 @@ public class ProcessProcessingPaymentEventHandler
         order.CancelOrder();
         _logger.LogError("Order was cancelled because it ocurred error on payment");
         
-        _context.Orders.Update(order);
-        await _context.SaveChangesAsync();
+        await _orderRepository.UpdateOrderAsync(order);
 
         return order;
     }

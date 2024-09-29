@@ -19,7 +19,7 @@ public static class DependenciesConfigurationExtensions
         services.AddScoped<CreateOrderHandler>();
         services.AddScoped<CancelOrderHandler>();
         services.AddScoped<GetOrdersQueryHandler>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<OrderRepository>();
         
         services.AddScoped<InventoryService>();
         services.AddScoped<CustomerEmailService>();

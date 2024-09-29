@@ -38,11 +38,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
 });
 
-var connectionString = builder.Configuration.GetConnectionString("OrderManagementDatabase");
+var connectionString = builder.Configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<IDbContextFactory<OrderManagementDbContext>, OrderManagementDbContextFactory>();
 builder.Services.AddScoped<IEfDbContextAccessor<OrderManagementDbContext>, OrderManagementContextAccessor>();
-builder.Services.AddScoped<IDbContextFactory, OrderManagementDbContextFactory>();
 
 builder.Services.ConfigureDomainDependenciesServices();
 

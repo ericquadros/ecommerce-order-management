@@ -9,11 +9,9 @@ namespace EcommerceOrderManagement.Infrastructure.EFContext;
 
 public class OrderManagementDbContext : DbContext, IUnitOfWork
 {
-    private static IConfiguration _configuration;
-    public OrderManagementDbContext(DbContextOptions<OrderManagementDbContext> options, IConfiguration configuration)
+    public OrderManagementDbContext(DbContextOptions<OrderManagementDbContext> options)
         : base(options)
     {
-        _configuration = configuration;
     }
     
     public DbSet<Customer> Customers { get; set; }
@@ -38,10 +36,8 @@ public class OrderManagementDbContext : DbContext, IUnitOfWork
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
-        
-        string connectionString = _configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
                                  
-        optionsBuilder.UseSqlServer(connectionString)
+        optionsBuilder
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging();
     }
@@ -67,7 +63,7 @@ public class OrderManagementDbContext : DbContext, IUnitOfWork
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw e;
+            throw;
         }
     }
 }

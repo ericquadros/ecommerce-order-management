@@ -7,22 +7,19 @@ using Microsoft.Extensions.Configuration;
 
 namespace EcommerceOrderManagement.Infrastructure.EFContext;
 
-public class OrderManagementDbContextFactory : IDbContextFactory
+public class OrderManagementDbContextFactory : IDbContextFactory, IDbContextFactory<OrderManagementDbContext>
 {
     private readonly DbContextOptions<OrderManagementDbContext> _options;
-    private readonly IConfiguration _configuration;
 
     public OrderManagementDbContextFactory(
-        DbContextOptions<OrderManagementDbContext> options,
-        IConfiguration configuration)
+        DbContextOptions<OrderManagementDbContext> options)
     {
         _options = options;
-        _configuration = configuration;
     }
 
     public OrderManagementDbContext CreateDbContext()
     {
-        return new OrderManagementDbContext(_options, _configuration);
+        return new OrderManagementDbContext(_options);
     }
 }
 

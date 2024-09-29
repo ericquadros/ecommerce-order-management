@@ -1,3 +1,4 @@
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.Domain.PaymentManagementContext.StockItems.Application.Events;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
@@ -14,33 +15,31 @@ public class ProcessPickingItemsOrderEventHandler
     private readonly OrderManagementDbContext _context;
     private readonly ILogger<ProcessPickingItemsOrderEventHandler> _logger;
     private readonly InventoryService _inventoryService;
-    private readonly CustomerEmailService _emailService; // Adicionado para enviar e-mails ao cliente
+    private readonly CustomerEmailService _emailService;
+    private readonly OrderRepository _orderRepository;
 
     public ProcessPickingItemsOrderEventHandler(
         OrderManagementDbContext context,
         ILogger<ProcessPickingItemsOrderEventHandler> logger,
         InventoryService inventoryService,
-        CustomerEmailService emailService) // Adicionado para injeção do serviço de email
+        CustomerEmailService emailService,
+        OrderRepository orderRepository)
     {
         _context = context;
         _logger = logger;
         _inventoryService = inventoryService;
-        _emailService = emailService; // Inicialização do serviço de email
+        _emailService = emailService;
+        _orderRepository = orderRepository;
     }
 
     public async Task<Result<Order>> HandleAsync(OrderPickingItemsStatusChangedEvent orderEvent)
     {
         try
         {
-            var order = orderEvent.Object;
+            if (orderEvent?.Object?.Id is null)
+                return Result.Failure("The order is not setted in the event.");
 
-            // TODO: REMOVE
-            order = await _context.Orders
-                .Include(o => o.Items) // Inclui os itens da ordem
-                .Include(o => o.Customer) // Inclui o cliente
-                .Include(o => o.PixPayment) // Inclui o pagamento com cartão
-                .Include(o => o.CardPayment) // Inclui o pagamento com cartão
-                .FirstOrDefaultAsync(o => o.Id == orderEvent.Object.Id);
+            var order = await _orderRepository.GetOrderCompleteAsync(orderEvent?.Object?.Id);
 
             var allItemsAvailable = true;
             var itemsToDeduct = new List<(Guid ProductId, int Quantity)>();
@@ -80,9 +79,7 @@ public class ProcessPickingItemsOrderEventHandler
             }
 
             // Atualiza o pedido no contexto e salva
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
-
+            await _orderRepository.UpdateOrderAsync(order);
             // Enviar e-mails CustomerEmailService
 
             return order;

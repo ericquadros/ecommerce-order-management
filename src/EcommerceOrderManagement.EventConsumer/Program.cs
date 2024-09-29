@@ -70,12 +70,12 @@ public static class ServiceExtensions
         services.AddSingleton(kafkaSettings);
         services.AddSingleton<IKafkaMessageProcessorFactory, KafkaMessageProcessorFactory>();
         
-        var connectionString = configuration.GetConnectionString("OrderManagementDatabase");
+        var connectionString = configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
         services.AddDbContext<OrderManagementDbContext>(options =>
             options.UseSqlServer(connectionString));
-        services.AddScoped<IEfDbContextAccessor<OrderManagementDbContext>, OrderManagementContextAccessor>();
-        services.AddScoped<IDbContextFactory, OrderManagementDbContextFactory>();
-
+        services.AddDbContextFactory<OrderManagementDbContext>(options =>
+            options.UseSqlServer(connectionString));
+        
         services.ConfigureDomainDependenciesServices();
         // Register your services here
         services.AddSingleton<IKafkaConsumer, KafkaConsumer>();

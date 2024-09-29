@@ -1,3 +1,4 @@
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Application.Events;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
@@ -9,30 +10,32 @@ namespace EcommerceOrderManagement.Domain.PaymentManagementContext.Payments.Appl
 
 public class ProcessPaymentDoneEventHandler
 {
-    private readonly OrderManagementDbContext _context;
+    private readonly OrderRepository _orderRepository;
     private readonly ILogger<ProcessPaymentDoneEventHandler> _logger;
     private readonly IMessageBroker _messageBroker;
 
     public ProcessPaymentDoneEventHandler(
-        OrderManagementDbContext context,
+        OrderRepository orderRepository,
         ILogger<ProcessPaymentDoneEventHandler> logger,
         IMessageBroker messageBroker)
     {
-        _context = context;
+        _orderRepository = orderRepository;
         _logger = logger;
         _messageBroker = messageBroker;
     }
 
     public async Task<Result<Order>> HandleAsync(OrderPaymentDoneStatusChangedEvent orderEvent)
     {
-        var order = orderEvent.Object;
+        if (orderEvent?.Object?.Id is null)
+            return Result.Failure("The order is not setted in the event.");
+
+        var order = await _orderRepository.GetOrderCompleteAsync(orderEvent?.Object?.Id);
         
         var result = order.PickingOrder();
         if (result.IsFailure)
             return null;
-        
-        _context.Orders.Update(order);
-        await _context.SaveChangesAsync();
+
+        await _orderRepository.UpdateOrderAsync(order);
         
         // Publishing domain events
         foreach (var domainEvent in order.Events)

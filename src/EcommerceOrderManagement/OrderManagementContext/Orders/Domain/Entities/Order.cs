@@ -15,12 +15,13 @@ namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities
 public class Order : Entity
 {
     private readonly List<OrderItem> _items;
-    [JsonIgnore]
-    private readonly List<IDomainEvent<Order>> _domainEvents;
+    [JsonIgnore] private readonly List<IDomainEvent<Order>> _domainEvents;
     private IEnumerable<IDiscountStrategy> _discountStrategies;
 
     private Order() // EF
-    { }
+    {
+        _domainEvents = new List<IDomainEvent<Order>>();
+    }
 
     public Order(Customer customer, List<OrderItem> items, decimal totalAmount,  PixPayment? pixPayment = null, CardPayment? cardPayment = null)
     {
@@ -72,9 +73,7 @@ public class Order : Entity
         if (PixPayment is null && CardPayment is null)
             return Result.Failure("You need to set the payment.");
         
-        // Implementar lógica de completar o pedido (ex: atualizar status, emitir eventos)
-        if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderCompletedEvent))))
-            _domainEvents.Add(new OrderCompletedEvent(this));
+        _domainEvents.Add(new OrderCompletedEvent(this));
 
         return Result.Success();
     }
@@ -99,7 +98,6 @@ public class Order : Entity
 
         Status = OrderStatus.ProcessingPayment;
         
-        // if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderProcessingPaymentStatusChangedEvent))))
         _domainEvents.Add(new OrderProcessingPaymentStatusChangedEvent(this));
 
         return Result.Success();
@@ -107,10 +105,9 @@ public class Order : Entity
 
     public Result PickingOrder()
     {
-        // StringToDateOnlyConverter: REMOVE
-        // if (Status != OrderStatus.PaymentCompleted)
-        //     return Result.Failure("The status should be PaymentCompleted");
-
+        if (Status != OrderStatus.PaymentCompleted)
+            return Result.Failure("The status should be PaymentCompleted");
+    
         Status = OrderStatus.PickingOrder;
         _domainEvents.Add(new OrderPickingItemsStatusChangedEvent(this));
         
@@ -134,9 +131,10 @@ public class Order : Entity
             Status = OrderStatus.Cancelled;
             return Result.Success();
         }
+        
+        // TODO: Adicionar as outras condições e colocar o estorno
 
         return Result.Failure("Only orders awaiting processing can be cancelled.");
-        // AddDomainEvent(new OrderCancelledEvent(this));
     }
 
     public void AddDiscountStrategies(IEnumerable<IDiscountStrategy> discountStrategies)
@@ -171,10 +169,12 @@ public class Order : Entity
 
     public Result PaymentCompleted()
     {
+        if (Status != OrderStatus.ProcessingPayment)
+            return Result.Failure("The status should be ProcessingPayment");
+            
         Status = OrderStatus.PaymentCompleted;
         
-        if (!_domainEvents.Any(e => e.GetType().Equals(typeof(OrderPaymentDoneStatusChangedEvent))))
-            _domainEvents.Add(new OrderPaymentDoneStatusChangedEvent(this));
+        _domainEvents.Add(new OrderPaymentDoneStatusChangedEvent(this));
 
         return Result.Success();
     }
