@@ -4,11 +4,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace EcommerceOrderManagement.Migrations.Context;
 
-public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OrderManagementDbContext>
+public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OrderManagementMigrationsDbContext>
 {
-    public OrderManagementDbContext CreateDbContext(string[] args)
+    public OrderManagementMigrationsDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<OrderManagementDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<OrderManagementMigrationsDbContext>();
         
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -19,6 +19,6 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OrderManag
         Console.WriteLine(connectionString);
         optionsBuilder.UseSqlServer(connectionString);
 
-        return new OrderManagementDbContext(optionsBuilder.Options);
+        return new OrderManagementMigrationsDbContext(optionsBuilder.Options);
     }
 }

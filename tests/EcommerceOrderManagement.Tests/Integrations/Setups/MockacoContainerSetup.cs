@@ -4,7 +4,7 @@ using DotNet.Testcontainers.Containers;
 
 namespace EcommerceOrderManagement.Tests.Integrations;
 
-public class MockacoContainer : IAsyncLifetime
+public class MockacoContainerSetup : IAsyncLifetime
 {
     private readonly IContainer _container;
 
@@ -12,7 +12,7 @@ public class MockacoContainer : IAsyncLifetime
 
     public string ContainerUri => $"http://localhost:{ContainerPort}";
 
-    public MockacoContainer()
+    public MockacoContainerSetup()
     {
         ContainerPort = Random.Shared.Next(4000, 5000);
 

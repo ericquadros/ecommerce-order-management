@@ -5,17 +5,31 @@ using EcommerceOrderManagement.OrderManagementContext.Endpoints;
 using FastEndpoints;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
+using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .MinimumLevel.Override("System", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .WriteTo.Console()
+    .WriteTo.File("ecommerceOrderManagementLogs.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddFastEndpoints(o =>
 {
     o.Assemblies = new[]
     {
         typeof(CreateOrderEndpoint).Assembly
-        // typeof(CancelOrderEndpoint).Assembly,
     };
 });
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,18 +41,19 @@ builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
+    var culture = Environment.GetEnvironmentVariable("ASPNETCORE_CULTURE") ?? "pt-BR";
     var supportedCultures = new[]
     {
         new CultureInfo("pt-BR"),
         new CultureInfo("en-US")
     };
 
-    options.DefaultRequestCulture = new RequestCulture("pt-BR");
+    options.DefaultRequestCulture = new RequestCulture(culture);
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 });
 
-var connectionString = builder.Configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
+var connectionString = GetConnectionString(builder);
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -56,10 +71,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// app.UseAuthorization();
 
+app.MapControllers();
 app.UseFastEndpoints();
 
+// app.UseAuthorization();
 // AddEndpointCulture(app);
 // KafkaTestCommunication.Execute("web-api");
 
@@ -75,4 +91,14 @@ void AddEndpointCulture(WebApplication webApplication)
             CurrentUICulture = CultureInfo.CurrentUICulture.Name
         };
     });
+}
+
+string? GetConnectionString(WebApplicationBuilder webApplicationBuilder)
+{
+    return Environment.GetEnvironmentVariable("EcommerceOrderMmanagementDatabase") 
+           ?? webApplicationBuilder.Configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
+}
+
+public partial class WebApiProgram
+{
 }

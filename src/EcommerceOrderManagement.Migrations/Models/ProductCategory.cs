@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Migrations.Models;
 
-public class ProductCategory
+public class ProductCategoryModel
 {
     public Guid Id { get; set; }           // Unique identifier for the category
     public string Name { get; set; }       // Name of the category

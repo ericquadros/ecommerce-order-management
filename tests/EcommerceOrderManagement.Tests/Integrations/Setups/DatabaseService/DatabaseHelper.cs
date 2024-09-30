@@ -1,52 +1,25 @@
-﻿using EcommerceOrderManagement.Migrations.Context;
+using Dapper;
+using EcommerceOrderManagement.Migrations.Context;
 using EcommerceOrderManagement.Migrations.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Data.SqlClient;
 
-class Program
+namespace EcommerceOrderManagement.Tests.Integrations.Setups;
+
+public static class DatabaseHelper
 {
-    static void Main(string[] args)
+    public async static Task GeraDadosInicializacao<T>(OrderManagementMigrationsDbContext _dbContext, T data) where T : class
     {
-        var host = CreateHostBuilder(args).Build();
-
-        using (var scope = host.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<OrderManagementMigrationsDbContext>();
-
-            var configuration = services.GetRequiredService<IConfiguration>();
-            var shouldSeed = configuration.GetValue<bool>("SEED_DATABASE") ||
-                             configuration.GetValue<bool>("SeedData:RunSeed");
-
-            if (shouldSeed)
-            {
-                Console.WriteLine("Running database seed...");
-                SeedDatabase(context);
-            }
-        }
-        
-        Console.WriteLine("Migrations running!");
-        host.Run();
+        await _dbContext.Set<T>().AddAsync(data);
+        await _dbContext.SaveChangesAsync();
     }
     
-    static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .AddCommandLine(args);
-            })
-            .ConfigureServices((context, services) =>
-            {
-                var connectionString = context.Configuration.GetConnectionString("EcommerceOrderManagementDatabase");
-                services.AddDbContext<OrderManagementMigrationsDbContext>(options => options.UseSqlServer(connectionString));
-            });
+    public static async Task ExecuteCommand(string command, DynamicParameters? parameters = null)
+    {
+        using SqlConnection conexao = new(IntegrationTestsSetup.Database.ConnectionString);
+        await conexao.ExecuteAsync(command);
+    }
     
-    static void SeedDatabase(OrderManagementMigrationsDbContext context)
+    public async static Task SeedInitialDatabase(OrderManagementMigrationsDbContext context)
     {
         if (!context.ProductCategories.Any())
         {
@@ -62,6 +35,8 @@ class Program
             context.ProductCategories.AddRange(categories);
             context.SaveChanges();
         }
+
+        var a = context.Products.ToList();
 
         if (!context.Products.Any())
         {

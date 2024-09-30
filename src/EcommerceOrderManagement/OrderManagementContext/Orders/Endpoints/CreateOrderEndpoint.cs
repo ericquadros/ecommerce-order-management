@@ -32,7 +32,7 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderRequest>
         var result = await _handler.Handle(commandResult.Value!, cancellationToken);
         if (result.IsFailure)
         {
-            await SendAsync(new { Error = commandResult.Error }, 400, cancellationToken);
+            await SendAsync(new { Error = result.Error }, 400, cancellationToken);
             return;
         }
         

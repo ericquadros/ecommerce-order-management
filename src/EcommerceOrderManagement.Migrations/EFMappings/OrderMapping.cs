@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EcommerceOrderManagement.Migrations.EFMappings;
 
-public class OrderMapping : IEntityTypeConfiguration<Order>
+public class OrderMapping : IEntityTypeConfiguration<OrderModel>
 {
-    public void Configure(EntityTypeBuilder<Order> builder)
+    public void Configure(EntityTypeBuilder<OrderModel> builder)
     {
         builder.HasKey(o => o.Id);
 

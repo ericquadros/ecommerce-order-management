@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EcommerceOrderManagement.Migrations.Migrations
 {
-    [DbContext(typeof(OrderManagementDbContext))]
+    [DbContext(typeof(OrderManagementMigrationsDbContext))]
     [Migration("20240924190950_AddColumnColumsProduct")]
     partial class AddColumnColumsProduct
     {

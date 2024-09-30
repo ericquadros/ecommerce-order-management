@@ -1,7 +1,6 @@
 ﻿ENV ASPNETCORE_CULTURE=pt-BR
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build

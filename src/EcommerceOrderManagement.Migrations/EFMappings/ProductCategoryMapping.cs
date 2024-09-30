@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EcommerceOrderManagement.Migrations.EFMappings;
 
-public class ProductCategoryMapping : IEntityTypeConfiguration<ProductCategory>
+public class ProductCategoryMapping : IEntityTypeConfiguration<ProductCategoryModel>
 {
-    public void Configure(EntityTypeBuilder<ProductCategory> builder)
+    public void Configure(EntityTypeBuilder<ProductCategoryModel> builder)
     {
         builder.HasKey(pc => pc.Id);
 

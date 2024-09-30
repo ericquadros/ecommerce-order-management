@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace EcommerceOrderManagement.Migrations.EFMappings;
 
 
-public class CardPaymentMapping : IEntityTypeConfiguration<CardPayment>
+public class CardPaymentMapping : IEntityTypeConfiguration<CardPaymentModel>
 {
-    public void Configure(EntityTypeBuilder<CardPayment> builder)
+    public void Configure(EntityTypeBuilder<CardPaymentModel> builder)
     {
         builder.ToTable("CardPayments");
 
@@ -44,7 +44,7 @@ public class CardPaymentMapping : IEntityTypeConfiguration<CardPayment>
         
         builder.HasOne(cp => cp.Order)
             .WithOne(o => o.CardPayment)
-            .HasForeignKey<CardPayment>(cp => cp.OrderId)
+            .HasForeignKey<CardPaymentModel>(cp => cp.OrderId)
             .OnDelete(DeleteBehavior.Restrict); // Ajuste conforme a lógica de negócios
     }
 }

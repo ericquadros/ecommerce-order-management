@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Migrations.Models;
 
-public class Customer
+public class CustomerModel
 {
     public Guid Id { get; set; }
     public string FirstName { get; set; }

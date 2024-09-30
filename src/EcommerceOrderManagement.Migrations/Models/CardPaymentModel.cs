@@ -1,6 +1,6 @@
 namespace EcommerceOrderManagement.Migrations.Models;
 
-public class CardPayment
+public class CardPaymentModel
 {
     public Guid Id { get; set; }
     public string CardNumber { get; set; }
@@ -8,7 +8,7 @@ public class CardPayment
     public string ExpirationDate { get; set; }
     public string Cvv { get; set; }
     public Guid OrderId { get; set; }
-    public Order Order { get; set; }
+    public OrderModel Order { get; set; }
     
     public int Installments { get; set; }
     public bool HasRefund { get; set; }

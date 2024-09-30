@@ -44,8 +44,10 @@ public class OrderRepository : IOrderRepository
     public async Task<bool> AddOrderAsync(Order order, CancellationToken cancellationToken = default)
     {
         using var context = _dbContextFactory.CreateDbContext();
-        
-        context.Customers.Attach(order.Customer);
+
+        var customerExists = context.Customers.Any(c => c.Id == order.Customer.Id);
+        if (customerExists) 
+            context.Customers.Attach(order.Customer);
         
         await context.Orders.AddAsync(order, cancellationToken);
         return await context.SaveEntitiesAsync(cancellationToken);
@@ -57,11 +59,25 @@ public class OrderRepository : IOrderRepository
         context.Orders.Update(order);
         await context.SaveChangesAsync();
     }
+    
+    public async Task<List<Order>> GetOrdersFromPreviousDay()
+    {
+        using var context = _dbContextFactory.CreateDbContext();
+        var yesterday = DateTime.UtcNow.AddDays(-1).Date;
+        var today = yesterday.AddDays(1);
+
+        return await context.Orders
+            .Include(order => order.Items)  // Inclui os itens do pedido
+            .ThenInclude(item => item.Product)   // Inclui os detalhes do produto dentro dos itens
+            .Where(order => order.OrderDate >= yesterday && order.OrderDate < today)
+            .ToListAsync();
+    }
 }
 
 public interface IOrderRepository
 {
     Task<List<OrderDto>> GetOrdersAsync(int page, int pageSize, CancellationToken cancellationToken);
+    Task<List<Order>> GetOrdersFromPreviousDay();
 }
 
 public class OrderDto

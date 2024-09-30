@@ -5,19 +5,19 @@ using Microsoft.Extensions.Configuration;
 
 namespace EcommerceOrderManagement.Migrations.Context;
 
-public class OrderManagementDbContext : DbContext
+public class OrderManagementMigrationsDbContext : DbContext
 {
-    public OrderManagementDbContext(DbContextOptions<OrderManagementDbContext> options)
+    public OrderManagementMigrationsDbContext(DbContextOptions<OrderManagementMigrationsDbContext> options)
         : base(options)
     {}
     
-    public DbSet<Product> Products { get; set; }
-    public DbSet<ProductCategory> ProductCategories { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<ProductModel> Products { get; set; }
+    public DbSet<ProductCategoryModel> ProductCategories { get; set; }
+    public DbSet<OrderModel> Orders { get; set; }
+    public DbSet<OrderItemModel> OrderItems { get; set; }
+    public DbSet<CustomerModel> Customers { get; set; }
     public DbSet<PixPayment> PixPayments { get; set; }
-    public DbSet<CardPayment> CardPayments { get; set; }
+    public DbSet<CardPaymentModel> CardPayments { get; set; }
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     { 
@@ -37,8 +37,14 @@ public class OrderManagementDbContext : DbContext
             .AddJsonFile("appsettings.json")
             .Build();
 
-        string connectionString = configuration.GetConnectionString("EcommerceOrderMmanagementDatabase");
+        string connectionString = GetConnectionString(configuration);
                                  
         optionsBuilder.UseSqlServer(connectionString);
+    }
+    
+    private string? GetConnectionString(IConfiguration configuration)
+    {
+        return Environment.GetEnvironmentVariable("EcommerceOrderManagementDatabase") 
+               ?? configuration.GetConnectionString("EcommerceOrderManagementDatabase");
     }
 }

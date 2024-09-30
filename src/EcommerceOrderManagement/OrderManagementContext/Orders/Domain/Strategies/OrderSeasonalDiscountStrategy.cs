@@ -7,8 +7,9 @@ public class OrderSeasonalDiscountStrategy : IDiscountStrategy
     public decimal ApplyDiscount(Order order)
     {
         var septemberMonth = 9;
-        // Verify if we stay in september month
-        if (order.OrderDate.Month == septemberMonth)
+        var octoberMonth = 10;
+        // Verify if we stay in september or october month
+        if (order.OrderDate.Month == septemberMonth || order.OrderDate.Month == octoberMonth)
         {
             return order.TotalAmount * 0.05m; // 5% of discount
         }
