@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "dependencies": {
+    "YourProjectName": {
+      "type": "EcommerceOrderManagement.Tests",
+      "version": "1.0.0"
+    }
+  },
+  "frameworks": {
+    "net8.0": {
+      "dependencies": {
+        // suas dependências aqui
+      }
+    }
+  },
+  "runtimes": {
+    "win-x64": {},
+    "linux-x64": {},
+    "osx-x64": {}
+  }
+}

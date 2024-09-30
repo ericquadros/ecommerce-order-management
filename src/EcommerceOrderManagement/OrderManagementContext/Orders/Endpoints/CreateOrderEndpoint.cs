@@ -66,14 +66,13 @@ public record PaymentDetails(
     CardPayment? Card
 );
 
-public record PixPayment(
-    string TransactionId
-);
+public record PixPayment(string TransactionId, bool HasRefund);
 
 public record CardPayment(
     string CardNumber,
     string CardHolder,
     string ExpirationDate,
     string Cvv,
-    int Installments
+    int Installments,
+    bool HasRefund 
 );

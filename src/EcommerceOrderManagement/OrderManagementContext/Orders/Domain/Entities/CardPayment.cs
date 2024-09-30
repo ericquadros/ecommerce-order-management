@@ -6,7 +6,7 @@ namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities
 public class CardPayment : Entity, IPayment
 {
     private const int MAX_INSTALLMENTS = 12;
-    public CardPayment(string cardNumber, string cardHolder, string expirationDate, string cvv, int installments, Guid orderId)
+    public CardPayment(string cardNumber, string cardHolder, string expirationDate, string cvv, int installments, bool hasRefund, Guid orderId)
     {
         CardNumber = cardNumber;
         CardHolder = cardHolder;
@@ -14,6 +14,7 @@ public class CardPayment : Entity, IPayment
         Cvv = cvv;
         OrderId = orderId;
         Installments = installments;
+        HasRefund = hasRefund;
         Validate();
     }
 
@@ -26,6 +27,7 @@ public class CardPayment : Entity, IPayment
     public string Cvv { get; private set; }
     public Guid OrderId { get; private set; }
     public int Installments { get; private set; }
+    public bool HasRefund { get; private set; }
 
     private void Validate()
     {

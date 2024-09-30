@@ -33,13 +33,15 @@ public class CardPaymentMapping : IEntityTypeConfiguration<CardPayment>
             .HasColumnType("varchar(4)")
             .HasMaxLength(4);
         
+        builder.Property(p => p.HasRefund)
+            .IsRequired();
+        
         builder.Property(o => o.CreatedAt)
             .HasColumnType("datetime");
         
         builder.Property(o => o.UpdatedAt)
             .HasColumnType("datetime");
-
-
+        
         builder.HasOne(cp => cp.Order)
             .WithOne(o => o.CardPayment)
             .HasForeignKey<CardPayment>(cp => cp.OrderId)

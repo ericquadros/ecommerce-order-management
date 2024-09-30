@@ -7,16 +7,18 @@ namespace EcommerceOrderManagement.OrderManagementContext.Orders.Domain.Entities
 public class PixPayment : Entity, IPayment
 {
     private const decimal PERCENTAGE_DISCOUNT = 0.05m; 
-    public PixPayment(string transactionId, Guid orderId)
+    public PixPayment(string transactionId, bool hasRefund, Guid orderId)
     {
         TransactionId = transactionId;
         OrderId = orderId;
+        HasRefund = hasRefund;
         Validate();
     }
 
     private PixPayment() // EF
     { }
 
+    public bool HasRefund { get; private set; }
     public string TransactionId { get; private set; }
     public Guid OrderId { get; private set; }
 

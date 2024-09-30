@@ -11,6 +11,7 @@ public class CardPayment
     public Order Order { get; set; }
     
     public int Installments { get; set; }
+    public bool HasRefund { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

@@ -132,7 +132,17 @@ public class Order : Entity
             return Result.Success();
         }
         
-        // TODO: Adicionar as outras condições e colocar o estorno
+        if (Status == OrderStatus.PaymentCompleted || Status == OrderStatus.WaitingForStock)
+        {
+            if (PixPayment is not null && !PixPayment.HasRefund)
+                return Result.Failure("Only orders with refunds can be cancelled.");
+            
+            if (CardPayment is not null && !CardPayment.HasRefund)
+                return Result.Failure("Only orders with refunds can be cancelled.");
+            
+            Status = OrderStatus.Cancelled;
+            return Result.Success();
+        }
 
         return Result.Failure("Only orders awaiting processing can be cancelled.");
     }

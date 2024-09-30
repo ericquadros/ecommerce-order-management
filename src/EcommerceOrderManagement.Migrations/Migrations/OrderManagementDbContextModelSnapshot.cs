@@ -51,6 +51,9 @@ namespace EcommerceOrderManagement.Migrations.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("varchar(5)");
 
+                    b.Property<bool>("HasRefund")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Installments")
                         .HasColumnType("int");
 
@@ -180,6 +183,9 @@ namespace EcommerceOrderManagement.Migrations.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
+
+                    b.Property<bool>("HasRefund")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");

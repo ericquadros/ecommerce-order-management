@@ -2,6 +2,7 @@ using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Application.
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Entities;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.Strategies;
 using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Domain.ValueObjects;
+using EcommerceOrderManagement.Domain.OrderManagementContext.Orders.Repositories;
 using EcommerceOrderManagement.Infrastructure;
 using EcommerceOrderManagement.Infrastructure.EFContext;
 using EcommerceOrderManagement.Infrastructure.Interfaces;
@@ -12,8 +13,12 @@ namespace EcommerceOrderManagement.OrderManagementContext.Orders.Application.Han
 
 public class CreateOrderHandler(
     OrderManagementDbContext context,
+    OrderRepository orderRepository,
+    ProductRepository productRepository,
+    CustomerRepository customerRepository,
     IMessageBroker brokerService,
-    IEnumerable<IDiscountStrategy> discountStrategies) : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
+    IEnumerable<IDiscountStrategy> discountStrategies) 
+    : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
 {
     public async Task<Result<CreateOrderResponse>> Handle(
         CreateOrderCommand command,
@@ -22,16 +27,16 @@ public class CreateOrderHandler(
         // Find or create a new customer
         var customer = await GetOrCreateCustomer(command, cancellationToken);
         
-        var orderItems = new List<OrderItem>();
-        orderItems.AddRange(command.Items.Select(i => new OrderItem(new Guid(i.ProductId), i.Quantity, i.Price)));
-        
-        var validationResult = await ValidateIfExistsProducts(orderItems, context, cancellationToken);
+        var productItems = new List<OrderItem>();
+        productItems.AddRange(command.Items.Select(i => new OrderItem(new Guid(i.ProductId), i.Quantity, i.Price)));
+        var productIdList = productItems.Select(p => p.ProductId);
+
+        var validationResult = await productRepository.ValidateIfExistsProducts(productIdList, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult;
 
-        var order = new Order(customer, orderItems, command.TotalAmount);
+        var order = new Order(customer, productItems, command.TotalAmount);
         
-        // Validar e associar o pagamento usando o método privado
         var paymentResult = ValidateAndCreatePayment(command, order);
         if (paymentResult.IsFailure)
             return Result.Failure(paymentResult.Error);
@@ -42,9 +47,8 @@ public class CreateOrderHandler(
         order.CalculateTotalWithDiscount();
         
         order.CompleteOrder();
-        
-        await context.Orders.AddAsync(order, cancellationToken);
-        var entitiesAdded = await context.SaveEntitiesAsync(cancellationToken);
+
+        await orderRepository.AddOrderAsync(order, cancellationToken);
 
         // Publishing domain events
         foreach (var domainEvent in order.Events)
@@ -58,23 +62,9 @@ public class CreateOrderHandler(
 
     private async Task<Customer> GetOrCreateCustomer(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        return await context.Customers
-                           .FirstOrDefaultAsync(c => c.Email.Address == command.Customer.Email, cancellationToken)
-                       ?? new Customer(command.Customer.FirstName, command.Customer.LastName, new Email(command.Customer.Email), command.Customer.Phone);
-    }
-
-    private async Task<Result> ValidateIfExistsProducts(IEnumerable<OrderItem> items, OrderManagementDbContext context, CancellationToken cancellationToken)
-    {
-        var productIds = items.Select(i => i.ProductId).ToList();
-        var existingProducts = await context.Products
-            .Where(p => productIds.Contains(p.Id))
-            .Select(p=>p.Id)
-            .ToListAsync(cancellationToken);
-
-        if (existingProducts.Count != productIds.Count)
-            return Result.Failure("One or more products does not exists.");
-        
-        return Result.Success();
+        return await customerRepository
+                   .GetCustomerByEmailAsync(command?.Customer?.Email!, cancellationToken)
+                ?? new Customer(command?.Customer?.FirstName!, command?.Customer?.LastName!, new Email(command?.Customer?.Email!), command?.Customer?.Phone!);
     }
     
     private Result<IPayment> ValidateAndCreatePayment(CreateOrderCommand command, Order order)
@@ -83,6 +73,7 @@ public class CreateOrderHandler(
         {
             var pixPayment = new PixPayment(
                 command.PixPayment.TransactionId,
+                command.PixPayment.HasRefund,
                 order.Id
             );
             return pixPayment;
@@ -95,6 +86,7 @@ public class CreateOrderHandler(
                 command.CardPayment.ExpirationDate,
                 command.CardPayment.Cvv,
                 command.CardPayment.Installments,
+                command.CardPayment.HasRefund,
                 order.Id
             );
             return cardPayment;

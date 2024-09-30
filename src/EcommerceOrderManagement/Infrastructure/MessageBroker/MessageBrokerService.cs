@@ -11,6 +11,7 @@ public class MessageBrokerService : IMessageBroker
 {
     private readonly IConfiguration _configuration;
     private readonly  ILogger<MessageBrokerService> _logger;
+    
     public MessageBrokerService(IConfiguration configuration, ILogger<MessageBrokerService> logger)
     {
         _configuration = configuration;
@@ -38,21 +39,13 @@ public class MessageBrokerService : IMessageBroker
                 if (shoudVerifyTopicExists) 
                     KafkaHelper.EnsureTopicExistsAsync(topic, _configuration, _logger);
         
-                var jsonSettings = new JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignorar referências circulares
-                    NullValueHandling = NullValueHandling.Ignore // Ignorar valores nulos
-                };
-                
-                var domainEventJson = JsonConvert.SerializeObject(domainEvent, jsonSettings);
-                _logger.LogInformation($"Serialized event: {domainEventJson}");
+                var domainEventJson = JsonConvert.SerializeObject(domainEvent, GetSettingsJsonSerializer());
 
                 using var producer = new ProducerBuilder<Null, string>(config).Build();
                 await producer.ProduceAsync(topic, new Message<Null, string> 
                 { 
                     Value = domainEventJson 
                 });
-                // producer.Flush(TimeSpan.FromSeconds(10));
             }
             else
                 throw new ArgumentException($"Event type {domainEvent.EventName} is not recognized.");
@@ -63,7 +56,17 @@ public class MessageBrokerService : IMessageBroker
             throw;
         }
     }
-    
+
+    private JsonSerializerSettings GetSettingsJsonSerializer()
+    {
+        var jsonSettings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        };
+        return jsonSettings;
+    }
+
     private string GetEventTopic(EventTypes eventType)
     {
         var eventName = eventType.ToString();

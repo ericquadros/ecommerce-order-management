@@ -41,6 +41,16 @@ public class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
     
+    public async Task<bool> AddOrderAsync(Order order, CancellationToken cancellationToken = default)
+    {
+        using var context = _dbContextFactory.CreateDbContext();
+        
+        context.Customers.Attach(order.Customer);
+        
+        await context.Orders.AddAsync(order, cancellationToken);
+        return await context.SaveEntitiesAsync(cancellationToken);
+    }
+    
     public async Task UpdateOrderAsync(Order order)
     {
         using var context = _dbContextFactory.CreateDbContext();
