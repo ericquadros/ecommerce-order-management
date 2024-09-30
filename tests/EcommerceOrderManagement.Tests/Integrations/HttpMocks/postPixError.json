@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "route": "pay/pix/error"
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "status": "error",
+      "message": "Invalid Pix transaction ID"
+    }
+  }
+}

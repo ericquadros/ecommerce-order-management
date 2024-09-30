@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "route": "pay/pix"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "status": "success",
+      "transactionId": "{{guid}}",
+      "message": "Pix payment processed"
+    }
+  }
+}
+   

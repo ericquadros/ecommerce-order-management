@@ -1,0 +1,57 @@
+2024-09-30 19:21:10.050 -03:00 [INF] No action descriptors found. This may indicate an incorrectly configured application or missing application parts. To learn more, visit https://aka.ms/aspnet/mvc/app-parts
+2024-09-30 19:21:10.182 -03:00 [INF] Registered 3 endpoints in 380 milliseconds.
+2024-09-30 19:21:10.210 -03:00 [INF] Now listening on: http://localhost:5032
+2024-09-30 19:21:10.210 -03:00 [INF] Application started. Press Ctrl+C to shut down.
+2024-09-30 19:21:10.210 -03:00 [INF] Hosting environment: Development
+2024-09-30 19:21:10.210 -03:00 [INF] Content root path: /Users/eric/PersonalDocuments/Projects/Courses/CSharpRightWay/csharp-right-way-challenge/src/EcommerceOrderManagement.WebApi
+2024-09-30 19:21:11.004 -03:00 [INF] Request starting HTTP/1.1 GET http://localhost:5032/swagger/index.html - null null
+2024-09-30 19:21:11.139 -03:00 [INF] Request finished HTTP/1.1 GET http://localhost:5032/swagger/index.html - 200 null text/html;charset=utf-8 136.2229ms
+2024-09-30 19:21:11.389 -03:00 [INF] Request starting HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui.css - null null
+2024-09-30 19:21:11.398 -03:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2024-09-30 19:21:11.399 -03:00 [INF] Request finished HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui.css - 200 143943 text/css 9.8916ms
+2024-09-30 19:21:11.409 -03:00 [INF] Request starting HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui-bundle.js - null null
+2024-09-30 19:21:11.412 -03:00 [INF] Request starting HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui-standalone-preset.js - null null
+2024-09-30 19:21:11.432 -03:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2024-09-30 19:21:11.433 -03:00 [INF] Request finished HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui-standalone-preset.js - 200 339486 text/javascript 21.3273ms
+2024-09-30 19:21:11.436 -03:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2024-09-30 19:21:11.436 -03:00 [INF] Request finished HTTP/1.1 GET http://localhost:5032/swagger/swagger-ui-bundle.js - 200 1096145 text/javascript 26.7045ms
+2024-09-30 19:21:11.598 -03:00 [INF] Request starting HTTP/1.1 GET http://localhost:5032/swagger/v1/swagger.json - null null
+2024-09-30 19:21:11.656 -03:00 [INF] Request finished HTTP/1.1 GET http://localhost:5032/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 58.19ms
+2024-09-30 19:21:13.269 -03:00 [INF] Request starting HTTP/1.1 POST http://localhost:5032/orders - application/json 671
+2024-09-30 19:21:13.271 -03:00 [WRN] Failed to determine the https port for redirect.
+2024-09-30 19:21:13.273 -03:00 [INF] Executing endpoint 'HTTP: POST /orders'
+2024-09-30 19:21:13.707 -03:00 [WRN] Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2024-09-30 19:21:13.745 -03:00 [WRN] No store type was specified for the decimal property 'Price' on entity type 'OrderItem'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2024-09-30 19:21:14.232 -03:00 [INF] Executed DbCommand (73ms) [Parameters=[@__email_0='daenerys.targaryen@winterfell.com' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[Id], [c].[CreatedAt], [c].[FirstName], [c].[LastName], [c].[Phone], [c].[UpdatedAt], [c].[Email]
+FROM [Customers] AS [c]
+WHERE [c].[Email] = @__email_0
+2024-09-30 19:21:14.353 -03:00 [INF] Executed DbCommand (41ms) [Parameters=[@__productIds_0='["0350ab23-28e1-4bb3-227d-08dcda5a2e50","8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf"]' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [p].[Id]
+FROM [Products] AS [p]
+WHERE [p].[Id] IN (
+    SELECT [p0].[value]
+    FROM OPENJSON(@__productIds_0) WITH ([value] uniqueidentifier '$') AS [p0]
+)
+2024-09-30 19:21:14.402 -03:00 [INF] Executed DbCommand (9ms) [Parameters=[@__order_Customer_Id_0='65056a4a-b957-461a-9f7c-82e07f1b10c5'], CommandType='"Text"', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Customers] AS [c]
+        WHERE [c].[Id] = @__order_Customer_Id_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+2024-09-30 19:21:14.610 -03:00 [INF] Executed DbCommand (32ms) [Parameters=[@p0='65056a4a-b957-461a-9f7c-82e07f1b10c5', @p1='2024-09-30T19:21:14.5134830-03:00' (DbType = DateTime), @p2='Daenerys' (Nullable = false) (Size = 100) (DbType = AnsiString), @p3='Targaryen' (Nullable = false) (Size = 100) (DbType = AnsiString), @p4='123-456-7890' (Nullable = false) (Size = 20) (DbType = AnsiString), @p5='2024-09-30T19:21:14.5136690-03:00' (DbType = DateTime), @p6='daenerys.targaryen@winterfell.com' (Nullable = false) (Size = 4000), @p7='0b28d713-a88c-4c31-934d-6e1c1e74cabd', @p8='2024-09-30T19:21:14.5112420-03:00' (DbType = DateTime), @p9='65056a4a-b957-461a-9f7c-82e07f1b10c5', @p10='2024-09-30T19:21:14.3593370-03:00' (DbType = DateTime), @p11='0', @p12='8739.9715' (Precision = 18) (Scale = 2), @p13='2024-09-30T19:21:14.5129710-03:00' (DbType = DateTime), @p14='14d74ee1-363e-4e85-899d-c10457df1688', @p15='Daenerys Targaryen' (Nullable = false) (Size = 100) (DbType = AnsiString), @p16='4111111111111111' (Nullable = false) (Size = 16) (DbType = AnsiString), @p17='2024-09-30T19:21:14.5131320-03:00' (DbType = DateTime), @p18='123' (Nullable = false) (Size = 4) (DbType = AnsiString), @p19='12/25' (Nullable = false) (Size = 5) (DbType = AnsiString), @p20='False', @p21='6', @p22='0b28d713-a88c-4c31-934d-6e1c1e74cabd', @p23='2024-09-30T19:21:14.5133510-03:00' (DbType = DateTime), @p24='6fea58a6-758a-4693-ac04-f9a77c59b81d', @p25='2024-09-30T19:21:14.5141230-03:00' (DbType = DateTime), @p26='0b28d713-a88c-4c31-934d-6e1c1e74cabd', @p27='999.99' (Precision = 18) (Scale = 2), @p28='8b07897d-6c9c-4e2e-b9dc-08dcda79fcdf', @p29='1', @p30='2024-09-30T19:21:14.5141250-03:00' (DbType = DateTime), @p31='9dd6ff81-b997-4618-b407-8c0400802106', @p32='2024-09-30T19:21:14.5138030-03:00' (DbType = DateTime), @p33='0b28d713-a88c-4c31-934d-6e1c1e74cabd', @p34='4099.99' (Precision = 18) (Scale = 2), @p35='0350ab23-28e1-4bb3-227d-08dcda5a2e50', @p36='2', @p37='2024-09-30T19:21:14.5139850-03:00' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [Customers] ([Id], [CreatedAt], [FirstName], [LastName], [Phone], [UpdatedAt], [Email])
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+INSERT INTO [Orders] ([Id], [CreatedAt], [CustomerId], [OrderDate], [Status], [TotalAmount], [UpdatedAt])
+VALUES (@p7, @p8, @p9, @p10, @p11, @p12, @p13);
+INSERT INTO [CardPayments] ([Id], [CardHolder], [CardNumber], [CreatedAt], [Cvv], [ExpirationDate], [HasRefund], [Installments], [OrderId], [UpdatedAt])
+VALUES (@p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21, @p22, @p23);
+INSERT INTO [OrderItems] ([Id], [CreatedAt], [OrderId], [Price], [ProductId], [Quantity], [UpdatedAt])
+VALUES (@p24, @p25, @p26, @p27, @p28, @p29, @p30),
+(@p31, @p32, @p33, @p34, @p35, @p36, @p37);
+2024-09-30 19:21:16.774 -03:00 [INF] Executed endpoint 'HTTP: POST /orders'
+2024-09-30 19:21:16.776 -03:00 [INF] Request finished HTTP/1.1 POST http://localhost:5032/orders - 200 null application/json; charset=utf-8 3507.4215ms
+2024-09-30 19:29:05.352 -03:00 [INF] Application is shutting down...
