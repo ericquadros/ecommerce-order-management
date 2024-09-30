@@ -1,28 +1,51 @@
-# ecommerce-order-management
-Repositório para o desafio final do treinamento C# do jeito certo apresentado pela Eximia na Bem 
+# eCommerce Order Management
 
-## Qual a proposta?
-O desafio consiste em desenvolver um sistema gerenciador de pedidos para e-commerce
+Repositório para o desafio final do treinamento **C# do jeito certo**, apresentado pela Eximia na Bem.
 
-## Como foi projetado
-Foi projetado com a ideia de termos um projeto principal conectado ao banco de dados e que contem o domínio da aplicação.
+## Proposta do Projeto
 
-- EcommerceOrderManagement: Projeto principal 
-- EcommerceOrderManagement.WebApi: Projeto de Web Api para interações com os pedidos dos clientes.
-- EcommerceOrderManagement.EventConsumer: Projeto consumidor de eventos Kafka para o processamento do pedido.
-- EcommerceOrderManagement.SchedulerWorker: Projeto agendador para tarefas agendadas, como, envio de e-mail para o dono de cada produto.
+O desafio consiste em desenvolver um sistema gerenciador de pedidos para e-commerce, com foco em escalabilidade, manutenibilidade e boas práticas de desenvolvimento.
 
-C4 da aplicação
-[Linkar imagem aqui]
+## Estrutura do Projeto
 
-Diagrama dos estados dos pedidos
-[Linkar imagem aqui]
+O sistema foi projetado com uma arquitetura modular, onde o projeto principal se conecta ao banco de dados e encapsula o domínio da aplicação. A estrutura é composta pelos seguintes módulos:
 
-## Como rodar?
+- **EcommerceOrderManagement**: Projeto principal que contém a lógica de domínio e interações com o banco de dados.
+- **EcommerceOrderManagement.WebApi**: Projeto de API Web responsável pelas interações com os pedidos dos clientes.
+- **EcommerceOrderManagement.EventConsumer**: Projeto consumidor de eventos Kafka para processamento assíncrono dos pedidos.
+- **EcommerceOrderManagement.SchedulerWorker**: Projeto de agendador que executa tarefas programadas, como o envio de e-mails para os proprietários dos produtos.
 
-Entrar na pasta src   
+### Diagramas
+
+- **C4 da Aplicação**  
+  ![C4 Diagram](./docs/assets/C4-Diagram.png)
+
+- **Diagrama de Estados dos Pedidos**  
+  ![State Diagram](./docs/assets/State-Diagram.png)
+
+## Como Executar o Projeto
+
+Para rodar o projeto localmente, siga os passos abaixo:
+
+1. Navegue até a pasta `src`:  
 ``cd src``
 
-Rodar no terminal:  
-``docker compose up -d``  
-``dotnet ef database update``
+2. Execute o comando abaixo para iniciar os serviços com Docker Compose:  
+```docker compose up -d```
+
+3. Após iniciar os serviços, atualize o banco de dados utilizando o Entity Framework Core:  
+```dotnet ef database update```
+
+
+## Como executar os testes
+
+Para rodar os testes localmente, siga os passos abaixo:
+
+1. Navegue até a pasta ` cd tests/EcommerceOrderManagement.Tests`:  
+   `` cd tests/EcommerceOrderManagement.Tests`` 
+
+2. Rode os testes:  
+   ```dotnet test```
+
+### Contribuição
+Sinta-se à vontade para contribuir com melhorias, correções ou sugestões. Todas as contribuições são bem-vindas!
