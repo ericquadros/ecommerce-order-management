@@ -17,11 +17,17 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        Console.WriteLine($"environment: {environment}");
+        
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{environment}.json", true, true)
+            .AddUserSecrets<Program>(optional: true) 
+            .AddEnvironmentVariables()
             .Build();
-
+        
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext() 
@@ -40,7 +46,7 @@ public class Program
 
                     var cronJobsSettings = context.Configuration.GetSection("CronsJobs").Get<CronsJobsSettings>();
                     
-                    // services.BuildServiceProvider().GetService<NotificateOwnerProductsJob>().Teste(); // Para testar, descomentar                    
+                    services.BuildServiceProvider().GetService<NotificateOwnerProductsJob>().Teste(); // Para testar, descomentar                    
                     
                     services.AddQuartz(q =>
                     {

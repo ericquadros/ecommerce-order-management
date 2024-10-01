@@ -13,37 +13,40 @@ public class NotificateOwnerProductsJob : IJob
     private readonly MailStripeSettings _mailStripeSettings;
     private readonly IOrderRepository _orderRepository;
 
-    // Injeção de dependência do repositório de pedidos
     public NotificateOwnerProductsJob(
         IConfiguration configuration,
         IOrderRepository orderRepository)
     {
         _mailStripeSettings = configuration.GetSection("MailStripe").Get<MailStripeSettings>();
+        _mailStripeSettings.Password = GetEmailPassword(configuration, _mailStripeSettings.Password);
+        
         _orderRepository = orderRepository;
     }
-    
+
     public async Task Execute(IJobExecutionContext context)
     {
         // Obter pedidos do dia anterior
         var orders = await GetOrdersFromPreviousDay();
-
+        
+        if (orders.Count == 0)
+            return;
+        
         // Enviar a lista de pedidos por e-mail, um por um
         await SendEmailWithOrders(orders);
     }
 
     private async Task<List<Order>> GetOrdersFromPreviousDay()
     {
-        var orders = await _orderRepository.GetOrdersFromPreviousDay();
-        return orders;
+        return await _orderRepository.GetOrdersFromPreviousDay();
     }
 
     private async Task SendEmailWithOrders(List<Order> orders)
     {
         using (var client = new SmtpClient(_mailStripeSettings.SmtpServer, _mailStripeSettings.Port)
-               {
-                   Credentials = new NetworkCredential(_mailStripeSettings.Username, _mailStripeSettings.Password),
-                   EnableSsl = true
-               })
+       {
+           Credentials = new NetworkCredential(_mailStripeSettings.Username, _mailStripeSettings.Password),
+           EnableSsl = true
+       })
         {
             foreach (var order in orders)
             {
@@ -82,4 +85,8 @@ public class NotificateOwnerProductsJob : IJob
         }
     }
     
+    private static string? GetEmailPassword(IConfiguration configuration, string defaultValue)
+    {
+        return configuration.GetValue<string>("MAILSTRIPE_PASSWORD") ?? defaultValue;
+    }
 }
